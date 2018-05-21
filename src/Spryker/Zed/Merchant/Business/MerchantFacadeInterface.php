@@ -32,7 +32,11 @@ interface MerchantFacadeInterface
     public function createMerchant(MerchantTransfer $merchantTransfer): MerchantTransfer;
 
     /**
-     * {@inheritdoc}
+     * Specification:
+     * - Finds a merchant record by ID in DB.
+     * - Uses incoming transfer to update entity fields.
+     * - Persists the entity to DB.
+     * - Throws MerchantNotFoundException in case a record is not found.
      *
      * @api
      *
@@ -43,7 +47,9 @@ interface MerchantFacadeInterface
     public function updateMerchant(MerchantTransfer $merchantTransfer): MerchantTransfer;
 
     /**
-     * {@inheritdoc}
+     * Specification:
+     * - Finds a merchant record by ID in DB.
+     * - Removes the merchant record.
      *
      * @api
      *
@@ -55,6 +61,8 @@ interface MerchantFacadeInterface
 
     /**
      * Specification:
+     * - Returns a merchant by merchant id in provided transfer.
+     * - Throws an exception in case a record is not found.
      *
      * @api
      *
