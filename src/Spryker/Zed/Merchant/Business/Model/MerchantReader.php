@@ -10,6 +10,7 @@ namespace Spryker\Zed\Merchant\Business\Model;
 use ArrayObject;
 use Generated\Shared\Transfer\MerchantCollectionTransfer;
 use Generated\Shared\Transfer\MerchantCriteriaFilterTransfer;
+use Generated\Shared\Transfer\MerchantCriteriaTransfer;
 use Generated\Shared\Transfer\MerchantTransfer;
 use Spryker\Zed\Merchant\Persistence\MerchantRepositoryInterface;
 
@@ -48,6 +49,19 @@ class MerchantReader implements MerchantReaderInterface
         $merchantCollectionTransfer = $this->expandMerchantCollection($merchantCollectionTransfer);
 
         return $merchantCollectionTransfer;
+    }
+
+    /**
+     * @param \Generated\Shared\Transfer\MerchantCriteriaTransfer $merchantCriteriaTransfer
+     *
+     * @return \Generated\Shared\Transfer\MerchantCollectionTransfer
+     */
+    public function get(MerchantCriteriaTransfer $merchantCriteriaTransfer): MerchantCollectionTransfer
+    {
+        $merchantCriteriaFilterTransfer = new MerchantCriteriaFilterTransfer();
+        $merchantCriteriaFilterTransfer->fromArray($merchantCriteriaTransfer->toArray(), true);
+
+        return $this->find($merchantCriteriaFilterTransfer);
     }
 
     /**

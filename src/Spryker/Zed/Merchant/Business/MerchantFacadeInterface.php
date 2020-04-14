@@ -9,6 +9,7 @@ namespace Spryker\Zed\Merchant\Business;
 
 use Generated\Shared\Transfer\MerchantCollectionTransfer;
 use Generated\Shared\Transfer\MerchantCriteriaFilterTransfer;
+use Generated\Shared\Transfer\MerchantCriteriaTransfer;
 use Generated\Shared\Transfer\MerchantResponseTransfer;
 use Generated\Shared\Transfer\MerchantTransfer;
 
@@ -80,6 +81,22 @@ interface MerchantFacadeInterface
      * @return \Generated\Shared\Transfer\MerchantCollectionTransfer
      */
     public function find(MerchantCriteriaFilterTransfer $merchantCriteriaFilterTransfer): MerchantCollectionTransfer;
+
+    /**
+     * Specification:
+     * - Returns collection of merchants by provided criteria.
+     * - Pagination, filter and ordering options can be passed to criteria.
+     * - Pagination is controlled with page, maxPerPage, nbResults, previousPage, nextPage, firstIndex, lastIndex, firstPage and lastPage values.
+     * - Filter supports ordering by field.
+     * - Default order by merchant name.
+     *
+     * @api
+     *
+     * @param \Generated\Shared\Transfer\MerchantCriteriaTransfer $merchantCriteriaTransfer
+     *
+     * @return \Generated\Shared\Transfer\MerchantCollectionTransfer
+     */
+    public function get(MerchantCriteriaTransfer $merchantCriteriaTransfer): MerchantCollectionTransfer;
 
     /**
      * Specification:
