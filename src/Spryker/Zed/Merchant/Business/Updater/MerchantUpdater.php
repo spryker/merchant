@@ -5,15 +5,19 @@
  * Use of this software requires acceptance of the Evaluation License Agreement. See LICENSE file.
  */
 
-namespace Spryker\Zed\Merchant\Business\Model;
+namespace Spryker\Zed\Merchant\Business\Updater;
 
-use Generated\Shared\Transfer\MerchantCriteriaFilterTransfer;
+use Generated\Shared\Transfer\EventEntityTransfer;
+use Generated\Shared\Transfer\MerchantCriteriaTransfer;
 use Generated\Shared\Transfer\MerchantErrorTransfer;
 use Generated\Shared\Transfer\MerchantResponseTransfer;
 use Generated\Shared\Transfer\MerchantTransfer;
 use Spryker\Zed\Kernel\Persistence\EntityManager\TransactionTrait;
 use Spryker\Zed\Merchant\Business\Exception\MerchantNotSavedException;
-use Spryker\Zed\Merchant\Business\Model\Status\MerchantStatusValidatorInterface;
+use Spryker\Zed\Merchant\Business\MerchantUrlSaver\MerchantUrlSaverInterface;
+use Spryker\Zed\Merchant\Business\Status\MerchantStatusValidatorInterface;
+use Spryker\Zed\Merchant\Dependency\Facade\MerchantToEventFacadeInterface;
+use Spryker\Zed\Merchant\Dependency\MerchantEvents;
 use Spryker\Zed\Merchant\Persistence\MerchantEntityManagerInterface;
 use Spryker\Zed\Merchant\Persistence\MerchantRepositoryInterface;
 
@@ -35,7 +39,7 @@ class MerchantUpdater implements MerchantUpdaterInterface
     protected $merchantRepository;
 
     /**
-     * @var \Spryker\Zed\Merchant\Business\Model\Status\MerchantStatusValidatorInterface
+     * @var \Spryker\Zed\Merchant\Business\Status\MerchantStatusValidatorInterface
      */
     protected $merchantStatusValidator;
 
@@ -45,29 +49,37 @@ class MerchantUpdater implements MerchantUpdaterInterface
     protected $merchantPostUpdatePlugins;
 
     /**
-     * @var array|\Spryker\Zed\MerchantExtension\Dependency\Plugin\MerchantPostSavePluginInterface[]
+     * @var \Spryker\Zed\Merchant\Business\MerchantUrlSaver\MerchantUrlSaverInterface
      */
-    protected $merchantPostSavePlugins;
+    protected $merchantUrlSaver;
+
+    /**
+     * @var \Spryker\Zed\Merchant\Dependency\Facade\MerchantToEventFacadeInterface
+     */
+    protected $eventFacade;
 
     /**
      * @param \Spryker\Zed\Merchant\Persistence\MerchantEntityManagerInterface $merchantEntityManager
      * @param \Spryker\Zed\Merchant\Persistence\MerchantRepositoryInterface $merchantRepository
-     * @param \Spryker\Zed\Merchant\Business\Model\Status\MerchantStatusValidatorInterface $merchantStatusValidator
-     * @param \Spryker\Zed\MerchantExtension\Dependency\Plugin\MerchantPostSavePluginInterface[] $merchantPostSavePlugins
+     * @param \Spryker\Zed\Merchant\Business\Status\MerchantStatusValidatorInterface $merchantStatusValidator
      * @param \Spryker\Zed\MerchantExtension\Dependency\Plugin\MerchantPostUpdatePluginInterface[] $merchantPostUpdatePlugins
+     * @param \Spryker\Zed\Merchant\Business\MerchantUrlSaver\MerchantUrlSaverInterface $merchantUrlSaver
+     * @param \Spryker\Zed\Merchant\Dependency\Facade\MerchantToEventFacadeInterface $eventFacade
      */
     public function __construct(
         MerchantEntityManagerInterface $merchantEntityManager,
         MerchantRepositoryInterface $merchantRepository,
         MerchantStatusValidatorInterface $merchantStatusValidator,
-        array $merchantPostSavePlugins,
-        array $merchantPostUpdatePlugins
+        array $merchantPostUpdatePlugins,
+        MerchantUrlSaverInterface $merchantUrlSaver,
+        MerchantToEventFacadeInterface $eventFacade
     ) {
         $this->merchantEntityManager = $merchantEntityManager;
         $this->merchantRepository = $merchantRepository;
         $this->merchantStatusValidator = $merchantStatusValidator;
         $this->merchantPostUpdatePlugins = $merchantPostUpdatePlugins;
-        $this->merchantPostSavePlugins = $merchantPostSavePlugins;
+        $this->merchantUrlSaver = $merchantUrlSaver;
+        $this->eventFacade = $eventFacade;
     }
 
     /**
@@ -82,10 +94,10 @@ class MerchantUpdater implements MerchantUpdaterInterface
 
         $merchantResponseTransfer = $this->createMerchantResponseTransfer();
 
-        $merchantCriteriaFilterTransfer = new MerchantCriteriaFilterTransfer();
-        $merchantCriteriaFilterTransfer->setIdMerchant($merchantTransfer->getIdMerchant());
+        $merchantCriteriaTransfer = new MerchantCriteriaTransfer();
+        $merchantCriteriaTransfer->setIdMerchant($merchantTransfer->getIdMerchant());
 
-        $existingMerchantTransfer = $this->merchantRepository->findOne($merchantCriteriaFilterTransfer);
+        $existingMerchantTransfer = $this->merchantRepository->findOne($merchantCriteriaTransfer);
         if ($existingMerchantTransfer === null) {
             $merchantResponseTransfer = $this->addMerchantError($merchantResponseTransfer, static::ERROR_MESSAGE_MERCHANT_NOT_FOUND);
 
@@ -123,10 +135,73 @@ class MerchantUpdater implements MerchantUpdaterInterface
      */
     protected function executeUpdateTransaction(MerchantTransfer $merchantTransfer): MerchantTransfer
     {
+        $merchantTransfer = $this->merchantUrlSaver->saveMerchantUrls($merchantTransfer);
+        $merchantTransfer = $this->updateMerchantStores($merchantTransfer);
         $merchantTransfer = $this->merchantEntityManager->saveMerchant($merchantTransfer);
         $merchantTransfer = $this->executeMerchantPostUpdatePlugins($merchantTransfer);
 
+        $this->triggerPublishEvent($merchantTransfer);
+
         return $merchantTransfer;
+    }
+
+    /**
+     * @param \Generated\Shared\Transfer\MerchantTransfer $merchantTransfer
+     *
+     * @return \Generated\Shared\Transfer\MerchantTransfer
+     */
+    protected function updateMerchantStores(MerchantTransfer $merchantTransfer): MerchantTransfer
+    {
+        $merchantStoreRelationTransferMap = $this->merchantRepository->getMerchantStoreRelationMapByMerchantIds([$merchantTransfer->getIdMerchant()]);
+        $currentStoreRelationTransfer = $merchantStoreRelationTransferMap[$merchantTransfer->getIdMerchant()];
+
+        if (!$currentStoreRelationTransfer->getIdStores()) {
+            return $this->createMerchantStores(
+                $merchantTransfer,
+                $merchantTransfer->getStoreRelation()->getIdStores()
+            );
+        }
+
+        $currentStoreIds = $currentStoreRelationTransfer->getIdStores();
+        $requestedStoreIds = $merchantTransfer->getStoreRelation()->getIdStores();
+
+        $merchantTransfer = $this->createMerchantStores($merchantTransfer, array_diff($requestedStoreIds, $currentStoreIds));
+        $this->deleteMerchantStores($merchantTransfer, array_diff($currentStoreIds, $requestedStoreIds));
+
+        return $merchantTransfer;
+    }
+
+    /**
+     * @param \Generated\Shared\Transfer\MerchantTransfer $merchantTransfer
+     * @param int[] $storeIds
+     *
+     * @return \Generated\Shared\Transfer\MerchantTransfer
+     */
+    protected function createMerchantStores(MerchantTransfer $merchantTransfer, array $storeIds): MerchantTransfer
+    {
+        foreach ($storeIds as $idStore) {
+            $storeTransfer = $this->merchantEntityManager->createMerchantStore($merchantTransfer, $idStore);
+            $merchantTransfer->getStoreRelation()->addStores($storeTransfer);
+        }
+
+        $merchantTransfer->getStoreRelation()
+            ->setIdEntity($merchantTransfer->getIdMerchant())
+            ->setIdStores($storeIds);
+
+        return $merchantTransfer;
+    }
+
+    /**
+     * @param \Generated\Shared\Transfer\MerchantTransfer $merchantTransfer
+     * @param int[] $storeIds
+     *
+     * @return void
+     */
+    protected function deleteMerchantStores(MerchantTransfer $merchantTransfer, array $storeIds): void
+    {
+        foreach ($storeIds as $idStore) {
+            $this->merchantEntityManager->deleteMerchantStore($merchantTransfer, $idStore);
+        }
     }
 
     /**
@@ -143,10 +218,6 @@ class MerchantUpdater implements MerchantUpdaterInterface
             if (!$merchantResponseTransfer->getIsSuccess()) {
                 throw (new MerchantNotSavedException($merchantResponseTransfer->getErrors()));
             }
-        }
-
-        foreach ($this->merchantPostSavePlugins as $merchantPostSavePlugin) {
-            $merchantTransfer = $merchantPostSavePlugin->execute($merchantTransfer);
         }
 
         return $merchantTransfer;
@@ -170,7 +241,8 @@ class MerchantUpdater implements MerchantUpdaterInterface
     {
         $merchantTransfer
             ->requireName()
-            ->requireEmail();
+            ->requireEmail()
+            ->requireStoreRelation();
     }
 
     /**
@@ -184,5 +256,18 @@ class MerchantUpdater implements MerchantUpdaterInterface
         $merchantResponseTransfer->addError((new MerchantErrorTransfer())->setMessage($message));
 
         return $merchantResponseTransfer;
+    }
+
+    /**
+     * @param \Generated\Shared\Transfer\MerchantTransfer $merchantTransfer
+     *
+     * @return void
+     */
+    protected function triggerPublishEvent(MerchantTransfer $merchantTransfer): void
+    {
+        $eventEntityTransfer = new EventEntityTransfer();
+        $eventEntityTransfer->setId($merchantTransfer->getIdMerchant());
+
+        $this->eventFacade->trigger(MerchantEvents::MERCHANT_PUBLISH, $eventEntityTransfer);
     }
 }

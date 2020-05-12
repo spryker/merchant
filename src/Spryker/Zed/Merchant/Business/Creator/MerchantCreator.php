@@ -5,12 +5,16 @@
  * Use of this software requires acceptance of the Evaluation License Agreement. See LICENSE file.
  */
 
-namespace Spryker\Zed\Merchant\Business\Model;
+namespace Spryker\Zed\Merchant\Business\Creator;
 
+use Generated\Shared\Transfer\EventEntityTransfer;
 use Generated\Shared\Transfer\MerchantResponseTransfer;
 use Generated\Shared\Transfer\MerchantTransfer;
 use Spryker\Zed\Kernel\Persistence\EntityManager\TransactionTrait;
 use Spryker\Zed\Merchant\Business\Exception\MerchantNotSavedException;
+use Spryker\Zed\Merchant\Business\MerchantUrlSaver\MerchantUrlSaverInterface;
+use Spryker\Zed\Merchant\Dependency\Facade\MerchantToEventFacadeInterface;
+use Spryker\Zed\Merchant\Dependency\MerchantEvents;
 use Spryker\Zed\Merchant\MerchantConfig;
 use Spryker\Zed\Merchant\Persistence\MerchantEntityManagerInterface;
 
@@ -34,26 +38,34 @@ class MerchantCreator implements MerchantCreatorInterface
     protected $merchantPostCreatePlugins;
 
     /**
-     * @var \Spryker\Zed\MerchantExtension\Dependency\Plugin\MerchantPostSavePluginInterface[]
+     * @var \Spryker\Zed\Merchant\Business\MerchantUrlSaver\MerchantUrlSaverInterface
      */
-    protected $merchantPostSavePlugins;
+    protected $merchantUrlSaver;
+
+    /**
+     * @var \Spryker\Zed\Merchant\Dependency\Facade\MerchantToEventFacadeInterface
+     */
+    protected $eventFacade;
 
     /**
      * @param \Spryker\Zed\Merchant\Persistence\MerchantEntityManagerInterface $merchantEntityManager
      * @param \Spryker\Zed\Merchant\MerchantConfig $merchantConfig
-     * @param \Spryker\Zed\MerchantExtension\Dependency\Plugin\MerchantPostSavePluginInterface[] $merchantPostSavePlugins
      * @param \Spryker\Zed\MerchantExtension\Dependency\Plugin\MerchantPostCreatePluginInterface[] $merchantPostCreatePlugins
+     * @param \Spryker\Zed\Merchant\Business\MerchantUrlSaver\MerchantUrlSaverInterface $merchantUrlSaver
+     * @param \Spryker\Zed\Merchant\Dependency\Facade\MerchantToEventFacadeInterface $eventFacade
      */
     public function __construct(
         MerchantEntityManagerInterface $merchantEntityManager,
         MerchantConfig $merchantConfig,
-        array $merchantPostSavePlugins,
-        array $merchantPostCreatePlugins
+        array $merchantPostCreatePlugins,
+        MerchantUrlSaverInterface $merchantUrlSaver,
+        MerchantToEventFacadeInterface $eventFacade
     ) {
         $this->merchantEntityManager = $merchantEntityManager;
         $this->merchantConfig = $merchantConfig;
         $this->merchantPostCreatePlugins = $merchantPostCreatePlugins;
-        $this->merchantPostSavePlugins = $merchantPostSavePlugins;
+        $this->merchantUrlSaver = $merchantUrlSaver;
+        $this->eventFacade = $eventFacade;
     }
 
     /**
@@ -93,8 +105,32 @@ class MerchantCreator implements MerchantCreatorInterface
      */
     protected function executeCreateTransaction(MerchantTransfer $merchantTransfer): MerchantTransfer
     {
+        $storeRelationTransfer = $merchantTransfer->getStoreRelation();
+        $urlTransfers = $merchantTransfer->getUrlCollection();
+
         $merchantTransfer = $this->merchantEntityManager->saveMerchant($merchantTransfer);
+        $merchantTransfer = $this->createMerchantStores($merchantTransfer->setStoreRelation($storeRelationTransfer));
+        $merchantTransfer = $this->merchantUrlSaver->saveMerchantUrls($merchantTransfer->setUrlCollection($urlTransfers));
         $merchantTransfer = $this->executeMerchantPostCreatePlugins($merchantTransfer);
+
+        $this->triggerPublishEvent($merchantTransfer);
+
+        return $merchantTransfer;
+    }
+
+    /**
+     * @param \Generated\Shared\Transfer\MerchantTransfer $merchantTransfer
+     *
+     * @return \Generated\Shared\Transfer\MerchantTransfer
+     */
+    protected function createMerchantStores(MerchantTransfer $merchantTransfer): MerchantTransfer
+    {
+        foreach ($merchantTransfer->getStoreRelation()->getIdStores() as $idStore) {
+            $storeTransfer = $this->merchantEntityManager->createMerchantStore($merchantTransfer, $idStore);
+            $merchantTransfer->getStoreRelation()->addStores($storeTransfer);
+        }
+
+        $merchantTransfer->getStoreRelation()->setIdEntity($merchantTransfer->getIdMerchant());
 
         return $merchantTransfer;
     }
@@ -124,10 +160,6 @@ class MerchantCreator implements MerchantCreatorInterface
             }
         }
 
-        foreach ($this->merchantPostSavePlugins as $merchantPostSavePlugin) {
-            $merchantTransfer = $merchantPostSavePlugin->execute($merchantTransfer);
-        }
-
         return $merchantTransfer;
     }
 
@@ -140,6 +172,20 @@ class MerchantCreator implements MerchantCreatorInterface
     {
         $merchantTransfer
             ->requireName()
-            ->requireEmail();
+            ->requireEmail()
+            ->requireStoreRelation();
+    }
+
+    /**
+     * @param \Generated\Shared\Transfer\MerchantTransfer $merchantTransfer
+     *
+     * @return void
+     */
+    protected function triggerPublishEvent(MerchantTransfer $merchantTransfer): void
+    {
+        $eventEntityTransfer = new EventEntityTransfer();
+        $eventEntityTransfer->setId($merchantTransfer->getIdMerchant());
+
+        $this->eventFacade->trigger(MerchantEvents::MERCHANT_PUBLISH, $eventEntityTransfer);
     }
 }
