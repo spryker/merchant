@@ -8,10 +8,18 @@
 namespace Spryker\Zed\Merchant\Persistence;
 
 use Generated\Shared\Transfer\MerchantCollectionTransfer;
+use Generated\Shared\Transfer\MerchantCriteriaTransfer;
 use Generated\Shared\Transfer\MerchantTransfer;
 
 interface MerchantRepositoryInterface
 {
+    /**
+     * @param \Generated\Shared\Transfer\MerchantCriteriaTransfer $merchantCriteriaTransfer
+     *
+     * @return \Generated\Shared\Transfer\MerchantCollectionTransfer
+     */
+    public function get(MerchantCriteriaTransfer $merchantCriteriaTransfer): MerchantCollectionTransfer;
+
     /**
      * Specification:
      * - Returns a MerchantTransfer by merchant id.

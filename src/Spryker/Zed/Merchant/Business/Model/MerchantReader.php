@@ -7,6 +7,8 @@
 
 namespace Spryker\Zed\Merchant\Business\Model;
 
+use Generated\Shared\Transfer\MerchantCollectionTransfer;
+use Generated\Shared\Transfer\MerchantCriteriaTransfer;
 use Generated\Shared\Transfer\MerchantTransfer;
 use Spryker\Zed\Merchant\Business\Exception\MerchantNotFoundException;
 use Spryker\Zed\Merchant\Persistence\MerchantRepositoryInterface;
@@ -24,6 +26,19 @@ class MerchantReader implements MerchantReaderInterface
     public function __construct(MerchantRepositoryInterface $repository)
     {
         $this->repository = $repository;
+    }
+
+    /**
+     * @param \Generated\Shared\Transfer\MerchantCriteriaTransfer $merchantCriteriaTransfer
+     *
+     * @return \Generated\Shared\Transfer\MerchantCollectionTransfer
+     */
+    public function get(MerchantCriteriaTransfer $merchantCriteriaTransfer): MerchantCollectionTransfer
+    {
+        $merchantCollectionTransfer = $this->repository->get($merchantCriteriaTransfer);
+        $merchantCollectionTransfer = $this->expandMerchantCollection($merchantCollectionTransfer);
+
+        return $merchantCollectionTransfer;
     }
 
     /**
@@ -55,5 +70,43 @@ class MerchantReader implements MerchantReaderInterface
         $merchantTransfer->requireIdMerchant();
 
         return $this->repository->getMerchantById($merchantTransfer->getIdMerchant());
+    }
+
+    /**
+     * @param \Generated\Shared\Transfer\MerchantCollectionTransfer $merchantCollectionTransfer
+     *
+     * @return \Generated\Shared\Transfer\MerchantCollectionTransfer
+     */
+    protected function expandMerchantCollection(MerchantCollectionTransfer $merchantCollectionTransfer): MerchantCollectionTransfer
+    {
+        $merchantIds = $this->getMerchantIds($merchantCollectionTransfer);
+        $merchantStoreRelationTransferMap = $this->repository->getMerchantStoreRelationMapByMerchantIds($merchantIds);
+        $merchantUrlTransfersMap = $this->repository->getUrlsMapByMerchantIds($merchantIds);
+
+        $merchantTransfers = new \ArrayObject();
+        foreach ($merchantCollectionTransfer->getMerchants() as $merchantTransfer) {
+            $merchantTransfer->setStoreRelation($merchantStoreRelationTransferMap[$merchantTransfer->getIdMerchant()]);
+            $merchantTransfer->setUrlCollection(new \ArrayObject($merchantUrlTransfersMap[$merchantTransfer->getIdMerchant()] ?? []));
+
+            $merchantTransfers->append($merchantTransfer);
+        }
+        $merchantCollectionTransfer->setMerchants($merchantTransfers);
+
+        return $merchantCollectionTransfer;
+    }
+
+    /**
+     * @param \Generated\Shared\Transfer\MerchantCollectionTransfer $merchantCollectionTransfer
+     *
+     * @return int[]
+     */
+    protected function getMerchantIds(MerchantCollectionTransfer $merchantCollectionTransfer): array
+    {
+        return array_map(function (MerchantTransfer $merchantTransfer): int {
+            /** @var int $idMerchant */
+            $idMerchant = $merchantTransfer->getIdMerchant();
+
+            return $idMerchant;
+        }, $merchantCollectionTransfer->getMerchants()->getArrayCopy());
     }
 }
