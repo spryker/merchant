@@ -80,12 +80,10 @@ class MerchantReader implements MerchantReaderInterface
     protected function expandMerchantCollection(MerchantCollectionTransfer $merchantCollectionTransfer): MerchantCollectionTransfer
     {
         $merchantIds = $this->getMerchantIds($merchantCollectionTransfer);
-        $merchantStoreRelationTransferMap = $this->repository->getMerchantStoreRelationMapByMerchantIds($merchantIds);
         $merchantUrlTransfersMap = $this->repository->getUrlsMapByMerchantIds($merchantIds);
 
         $merchantTransfers = new \ArrayObject();
         foreach ($merchantCollectionTransfer->getMerchants() as $merchantTransfer) {
-            $merchantTransfer->setStoreRelation($merchantStoreRelationTransferMap[$merchantTransfer->getIdMerchant()]);
             $merchantTransfer->setUrlCollection(new \ArrayObject($merchantUrlTransfersMap[$merchantTransfer->getIdMerchant()] ?? []));
 
             $merchantTransfers->append($merchantTransfer);

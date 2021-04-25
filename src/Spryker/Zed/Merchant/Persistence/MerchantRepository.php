@@ -11,6 +11,12 @@ use Generated\Shared\Transfer\FilterTransfer;
 use Generated\Shared\Transfer\MerchantCollectionTransfer;
 use Generated\Shared\Transfer\MerchantCriteriaTransfer;
 use Generated\Shared\Transfer\MerchantTransfer;
+use Generated\Shared\Transfer\PaginationTransfer;
+use Generated\Shared\Transfer\StoreRelationTransfer;
+use Generated\Shared\Transfer\UrlTransfer;
+use Orm\Zed\Merchant\Persistence\SpyMerchantQuery;
+use Propel\Runtime\ActiveQuery\ModelCriteria;
+use Propel\Runtime\Collection\ObjectCollection;
 use Propel\Runtime\Formatter\ObjectFormatter;
 use Spryker\Zed\Kernel\Persistence\AbstractRepository;
 use Orm\Zed\Merchant\Persistence\Map\SpyMerchantTableMap;
@@ -49,6 +55,24 @@ class MerchantRepository extends AbstractRepository implements MerchantRepositor
         $merchantCollectionTransfer->setPagination($merchantCriteriaTransfer->getPagination());
 
         return $merchantCollectionTransfer;
+    }
+
+    /**
+     * @param \Orm\Zed\Merchant\Persistence\Base\SpyMerchantStore[]|\Propel\Runtime\Collection\ObjectCollection $merchantStoreEntities
+     * @param int $idMerchant
+     *
+     * @return \Orm\Zed\Merchant\Persistence\Base\SpyMerchantStore[]
+     */
+    protected function filterMerchantStoresById(ObjectCollection $merchantStoreEntities, int $idMerchant): array
+    {
+        $filteredMerchantStoreEntities = [];
+        foreach ($merchantStoreEntities as $merchantStoreEntity) {
+            if ($merchantStoreEntity->getFkMerchant() === $idMerchant) {
+                $filteredMerchantStoreEntities[] = $merchantStoreEntity;
+            }
+        }
+
+        return $filteredMerchantStoreEntities;
     }
 
     /**
@@ -116,6 +140,35 @@ class MerchantRepository extends AbstractRepository implements MerchantRepositor
 
 
     /**
+     * @param int[] $merchantIds
+     *
+     * @return \Generated\Shared\Transfer\UrlTransfer[][]
+     */
+    public function getUrlsMapByMerchantIds(array $merchantIds): array
+    {
+        $merchantUrlTransfersMap = [];
+
+        $urlEntities = $this->getFactory()
+            ->getUrlPropelQuery()
+            ->joinWithSpyLocale()
+            ->filterByFkResourceMerchant_In($merchantIds)
+            ->find();
+
+        if (!$urlEntities->count()) {
+            return $merchantUrlTransfersMap;
+        }
+
+        foreach ($urlEntities as $urlEntity) {
+            $merchantUrlTransfersMap[$urlEntity->getFkResourceMerchant()][] = $this->getFactory()
+                ->createPropelMerchantMapper()
+                ->mapUrlEntityToUrlTransfer($urlEntity, new UrlTransfer());
+        }
+
+        return $merchantUrlTransfersMap;
+    }
+
+
+    /**
      * @param \Orm\Zed\Merchant\Persistence\SpyMerchantQuery $merchantQuery
      * @param \Generated\Shared\Transfer\MerchantCriteriaTransfer $merchantCriteriaTransfer
      *
@@ -149,14 +202,6 @@ class MerchantRepository extends AbstractRepository implements MerchantRepositor
 
         if ($merchantCriteriaTransfer->getStatus() !== null) {
             $merchantQuery->filterByStatus($merchantCriteriaTransfer->getStatus());
-        }
-
-        if ($merchantCriteriaTransfer->getStore() !== null) {
-            $merchantQuery->useSpyMerchantStoreQuery()
-                ->useSpyStoreQuery()
-                ->filterByName($merchantCriteriaTransfer->getStore()->getName())
-                ->endUse()
-                ->endUse();
         }
 
         return $merchantQuery;

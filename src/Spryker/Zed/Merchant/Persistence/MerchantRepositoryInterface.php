@@ -49,4 +49,11 @@ interface MerchantRepositoryInterface
      * @return bool
      */
     public function hasKey(string $key): bool;
+
+    /**
+     * @param int[] $merchantIds
+     *
+     * @return \Generated\Shared\Transfer\UrlTransfer[][]
+     */
+    public function getUrlsMapByMerchantIds(array $merchantIds): array;
 }

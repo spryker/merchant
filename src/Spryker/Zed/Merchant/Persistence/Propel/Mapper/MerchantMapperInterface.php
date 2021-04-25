@@ -7,8 +7,11 @@
 
 namespace Spryker\Zed\Merchant\Persistence\Propel\Mapper;
 
+use Generated\Shared\Transfer\MerchantCollectionTransfer;
 use Generated\Shared\Transfer\MerchantTransfer;
+use Generated\Shared\Transfer\UrlTransfer;
 use Orm\Zed\Merchant\Persistence\SpyMerchant;
+use Orm\Zed\Url\Persistence\SpyUrl;
 
 interface MerchantMapperInterface
 {
@@ -33,4 +36,37 @@ interface MerchantMapperInterface
         SpyMerchant $spyMerchant,
         MerchantTransfer $merchantTransfer
     ): MerchantTransfer;
+
+    /**
+     * @param \Orm\Zed\Merchant\Persistence\SpyMerchant[] $merchantEntities
+     * @param \Generated\Shared\Transfer\MerchantCollectionTransfer $merchantCollectionTransfer
+     *
+     * @return \Generated\Shared\Transfer\MerchantCollectionTransfer
+     */
+    public function mapMerchantCollectionToMerchantCollectionTransfer(
+        $merchantEntities,
+        MerchantCollectionTransfer $merchantCollectionTransfer
+    ): MerchantCollectionTransfer;
+
+    /**
+     * @param \Orm\Zed\Merchant\Persistence\SpyMerchant $merchantEntity
+     * @param \Generated\Shared\Transfer\MerchantTransfer $merchantTransfer
+     *
+     * @return \Generated\Shared\Transfer\MerchantTransfer
+     */
+    public function mapMerchantEntityToMerchantTransfer(
+        SpyMerchant $merchantEntity,
+        MerchantTransfer $merchantTransfer
+    ): MerchantTransfer;
+
+    /**
+     * @param \Orm\Zed\Url\Persistence\SpyUrl $urlEntity
+     * @param \Generated\Shared\Transfer\UrlTransfer $urlTransfer
+     *
+     * @return \Generated\Shared\Transfer\UrlTransfer
+     */
+    public function mapUrlEntityToUrlTransfer(
+        SpyUrl $urlEntity,
+        UrlTransfer $urlTransfer
+    ): UrlTransfer;
 }

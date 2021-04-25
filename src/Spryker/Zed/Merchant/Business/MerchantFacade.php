@@ -84,6 +84,7 @@ class MerchantFacade extends AbstractFacade implements MerchantFacadeInterface
     }
 
     /**
+     * @deprecated Use {@link \Spryker\Zed\Merchant\Business\MerchantFacade::get()} instead.
      * {@inheritdoc}
      *
      * @api
@@ -92,7 +93,7 @@ class MerchantFacade extends AbstractFacade implements MerchantFacadeInterface
      */
     public function getMerchants(): MerchantCollectionTransfer
     {
-        return $this->getRepository()->getMerchants();
+        return $this->get(new MerchantCriteriaTransfer());
     }
 
     /**

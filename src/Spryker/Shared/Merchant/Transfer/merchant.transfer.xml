@@ -26,4 +26,7 @@
         <property name="store" type="Store"/>
     </transfer>
 
+    <transfer name="Store">
+    </transfer>
+
 </transfers>
