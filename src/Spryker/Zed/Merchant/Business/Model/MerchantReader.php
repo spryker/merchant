@@ -7,6 +7,7 @@
 
 namespace Spryker\Zed\Merchant\Business\Model;
 
+use ArrayObject;
 use Generated\Shared\Transfer\MerchantCollectionTransfer;
 use Generated\Shared\Transfer\MerchantCriteriaTransfer;
 use Generated\Shared\Transfer\MerchantTransfer;
@@ -80,9 +81,9 @@ class MerchantReader implements MerchantReaderInterface
     protected function expandMerchantCollection(MerchantCollectionTransfer $merchantCollectionTransfer): MerchantCollectionTransfer
     {
         $merchantIds = $this->getMerchantIds($merchantCollectionTransfer);
-        $merchantUrlTransfersMap = $this->repository->getUrlsMapByMerchantIds($merchantIds);
+        $merchantUrlTransfersMap = $this->repository->getGroupedUrlsByMerchantIds($merchantIds);
 
-        $merchantTransfers = new \ArrayObject();
+        $merchantTransfers = new ArrayObject();
         foreach ($merchantCollectionTransfer->getMerchants() as $merchantTransfer) {
             $merchantTransfer->setUrlCollection(new \ArrayObject($merchantUrlTransfersMap[$merchantTransfer->getIdMerchant()] ?? []));
 

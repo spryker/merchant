@@ -12,14 +12,14 @@ use Generated\Shared\Transfer\MerchantCollectionTransfer;
 use Generated\Shared\Transfer\MerchantCriteriaTransfer;
 use Generated\Shared\Transfer\MerchantTransfer;
 use Generated\Shared\Transfer\PaginationTransfer;
-use Generated\Shared\Transfer\StoreRelationTransfer;
 use Generated\Shared\Transfer\UrlTransfer;
+use Orm\Zed\Merchant\Persistence\Map\SpyMerchantTableMap;
 use Orm\Zed\Merchant\Persistence\SpyMerchantQuery;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\Collection\ObjectCollection;
 use Propel\Runtime\Formatter\ObjectFormatter;
 use Spryker\Zed\Kernel\Persistence\AbstractRepository;
-use Orm\Zed\Merchant\Persistence\Map\SpyMerchantTableMap;
+
 
 /**
  * @method \Spryker\Zed\Merchant\Persistence\MerchantPersistenceFactory getFactory()
@@ -144,7 +144,7 @@ class MerchantRepository extends AbstractRepository implements MerchantRepositor
      *
      * @return \Generated\Shared\Transfer\UrlTransfer[][]
      */
-    public function getUrlsMapByMerchantIds(array $merchantIds): array
+    public function getGroupedUrlsByMerchantIds(array $merchantIds): array
     {
         $merchantUrlTransfersMap = [];
 
@@ -215,7 +215,7 @@ class MerchantRepository extends AbstractRepository implements MerchantRepositor
      */
     protected function getPaginatedCollection(ModelCriteria $query, ?PaginationTransfer $paginationTransfer = null)
     {
-        if ($paginationTransfer !== null) {
+        if (!$paginationTransfer) {
             /** @var int $page */
             $page = $paginationTransfer
                 ->requirePage()

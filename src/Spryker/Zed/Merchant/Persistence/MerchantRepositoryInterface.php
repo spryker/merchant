@@ -55,5 +55,5 @@ interface MerchantRepositoryInterface
      *
      * @return \Generated\Shared\Transfer\UrlTransfer[][]
      */
-    public function getUrlsMapByMerchantIds(array $merchantIds): array;
+    public function getGroupedUrlsByMerchantIds(array $merchantIds): array;
 }
