@@ -7,6 +7,7 @@
 
 namespace Spryker\Zed\Merchant;
 
+use Orm\Zed\Url\Persistence\SpyUrlQuery;
 use Spryker\Zed\Kernel\AbstractBundleDependencyProvider;
 use Spryker\Zed\Kernel\Container;
 use Spryker\Zed\Merchant\Dependency\Service\MerchantToUtilTextServiceBridge;
@@ -17,6 +18,8 @@ use Spryker\Zed\Merchant\Dependency\Service\MerchantToUtilTextServiceBridge;
 class MerchantDependencyProvider extends AbstractBundleDependencyProvider
 {
     public const SERVICE_UTIL_TEXT = 'SERVICE_UTIL_TEXT';
+
+    public const PROPEL_QUERY_URL = 'PROPEL_QUERY_URL';
 
     /**
      * @param \Spryker\Zed\Kernel\Container $container
@@ -40,6 +43,20 @@ class MerchantDependencyProvider extends AbstractBundleDependencyProvider
         $container[static::SERVICE_UTIL_TEXT] = function (Container $container) {
             return new MerchantToUtilTextServiceBridge($container->getLocator()->utilText()->service());
         };
+
+        return $container;
+    }
+
+    /**
+     * @param \Spryker\Zed\Kernel\Container $container
+     *
+     * @return \Spryker\Zed\Kernel\Container
+     */
+    protected function addUrlPropelQuery(Container $container): Container
+    {
+        $container->set(static::PROPEL_QUERY_URL, $container->factory(function () {
+            return SpyUrlQuery::create();
+        }));
 
         return $container;
     }
