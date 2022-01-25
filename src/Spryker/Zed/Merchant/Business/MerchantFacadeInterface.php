@@ -8,6 +8,7 @@
 namespace Spryker\Zed\Merchant\Business;
 
 use Generated\Shared\Transfer\MerchantCollectionTransfer;
+use Generated\Shared\Transfer\MerchantCriteriaTransfer;
 use Generated\Shared\Transfer\MerchantTransfer;
 
 /**
@@ -95,4 +96,17 @@ interface MerchantFacadeInterface
      * @return \Generated\Shared\Transfer\MerchantTransfer|null
      */
     public function findMerchantById(MerchantTransfer $merchantTransfer): ?MerchantTransfer;
+
+    /**
+     * Specification:
+     * - Returns merchant which can filtered by merchant id and email.
+     * - Returns MerchantTransfer if found, NULL otherwise.
+     *
+     * @api
+     *
+     * @param \Generated\Shared\Transfer\MerchantCriteriaTransfer $merchantCriteriaTransfer
+     *
+     * @return \Generated\Shared\Transfer\MerchantTransfer|null
+     */
+    public function findOne(MerchantCriteriaTransfer $merchantCriteriaTransfer): ?MerchantTransfer;
 }

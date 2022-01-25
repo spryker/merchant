@@ -9,6 +9,7 @@ namespace SprykerTest\Zed\Merchant\Business;
 
 use Codeception\Test\Unit;
 use Exception;
+use Generated\Shared\Transfer\MerchantCriteriaTransfer;
 use Generated\Shared\Transfer\MerchantTransfer;
 use Spryker\Shared\Kernel\Transfer\Exception\RequiredTransferPropertyException;
 
@@ -201,6 +202,39 @@ class MerchantFacadeTest extends Unit
 
         $merchantTransferCollection = $this->getMerchantFacade()->getMerchants();
         $this->assertCount(2, $merchantTransferCollection->getMerchants());
+    }
+
+    /**
+     * @return void
+     */
+    public function testFindOneWillFindCorrectMerchant(): void
+    {
+        // Arrange
+        $expectedMerchant = $this->tester->haveMerchant();
+        $merchantCriteriaTransfer = (new MerchantCriteriaTransfer())->setIdMerchant($expectedMerchant->getIdMerchant());
+
+        // Act
+        $actualMerchant = $this->getMerchantFacade()->findOne($merchantCriteriaTransfer);
+
+        $this->assertEquals($expectedMerchant, $actualMerchant);
+    }
+
+    /**
+     * @return void
+     */
+    public function testFindOneByFakeIdWillNotFindMerchant(): void
+    {
+        // Arrange
+        $merchantTransfer = $this->tester->haveMerchant();
+
+        $merchantCriteriaTransfer = new MerchantCriteriaTransfer();
+        $merchantCriteriaTransfer->setIdMerchant($merchantTransfer->getIdMerchant() + 1);
+
+        // Act
+        $actualMerchant = $this->getMerchantFacade()->findOne($merchantCriteriaTransfer);
+
+        // Assert
+        $this->assertNull($actualMerchant);
     }
 
     /**

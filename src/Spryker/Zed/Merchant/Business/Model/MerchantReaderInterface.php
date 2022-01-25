@@ -7,6 +7,7 @@
 
 namespace Spryker\Zed\Merchant\Business\Model;
 
+use Generated\Shared\Transfer\MerchantCriteriaTransfer;
 use Generated\Shared\Transfer\MerchantTransfer;
 
 interface MerchantReaderInterface
@@ -24,4 +25,11 @@ interface MerchantReaderInterface
      * @return \Generated\Shared\Transfer\MerchantTransfer|null
      */
     public function findMerchantById(MerchantTransfer $merchantTransfer): ?MerchantTransfer;
+
+    /**
+     * @param \Generated\Shared\Transfer\MerchantCriteriaTransfer $merchantCriteriaTransfer
+     *
+     * @return \Generated\Shared\Transfer\MerchantTransfer|null
+     */
+    public function findOne(MerchantCriteriaTransfer $merchantCriteriaTransfer): ?MerchantTransfer;
 }

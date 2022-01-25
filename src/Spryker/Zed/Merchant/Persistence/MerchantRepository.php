@@ -8,7 +8,12 @@
 namespace Spryker\Zed\Merchant\Persistence;
 
 use Generated\Shared\Transfer\MerchantCollectionTransfer;
+use Generated\Shared\Transfer\MerchantCriteriaTransfer;
 use Generated\Shared\Transfer\MerchantTransfer;
+use Generated\Shared\Transfer\StoreRelationTransfer;
+use Generated\Shared\Transfer\UrlTransfer;
+use Orm\Zed\Merchant\Persistence\SpyMerchantQuery;
+use Propel\Runtime\Collection\ObjectCollection;
 use Spryker\Zed\Kernel\Persistence\AbstractRepository;
 
 /**
@@ -77,5 +82,39 @@ class MerchantRepository extends AbstractRepository implements MerchantRepositor
             ->createMerchantQuery()
             ->filterByMerchantKey($key)
             ->exists();
+    }
+
+    /**
+     * @param \Generated\Shared\Transfer\MerchantCriteriaTransfer $merchantCriteriaTransfer
+     *
+     * @return \Generated\Shared\Transfer\MerchantTransfer|null
+     */
+    public function findOne(MerchantCriteriaTransfer $merchantCriteriaTransfer): ?MerchantTransfer
+    {
+        $merchantQuery = $this->getFactory()->createMerchantQuery();
+        $merchantEntity = $this->applyFilters($merchantQuery, $merchantCriteriaTransfer)->findOne();
+
+        if (!$merchantEntity) {
+            return null;
+        }
+
+        return $this->getFactory()
+            ->createPropelMerchantMapper()
+            ->mapEntityToMerchantTransfer($merchantEntity, new MerchantTransfer());
+    }
+
+    /**
+     * @param \Orm\Zed\Merchant\Persistence\SpyMerchantQuery $merchantQuery
+     * @param \Generated\Shared\Transfer\MerchantCriteriaTransfer $merchantCriteriaTransfer
+     *
+     * @return \Orm\Zed\Merchant\Persistence\SpyMerchantQuery
+     */
+    protected function applyFilters(SpyMerchantQuery $merchantQuery, MerchantCriteriaTransfer $merchantCriteriaTransfer): SpyMerchantQuery
+    {
+        if ($merchantCriteriaTransfer->getIdMerchant() !== null) {
+            $merchantQuery->filterByIdMerchant($merchantCriteriaTransfer->getIdMerchant());
+        }
+
+        return $merchantQuery;
     }
 }

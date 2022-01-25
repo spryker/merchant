@@ -7,6 +7,7 @@
 
 namespace Spryker\Zed\Merchant\Business\Model;
 
+use Generated\Shared\Transfer\MerchantCriteriaTransfer;
 use Generated\Shared\Transfer\MerchantTransfer;
 use Spryker\Zed\Merchant\Business\Exception\MerchantNotFoundException;
 use Spryker\Zed\Merchant\Persistence\MerchantRepositoryInterface;
@@ -19,11 +20,18 @@ class MerchantReader implements MerchantReaderInterface
     protected $repository;
 
     /**
-     * @param \Spryker\Zed\Merchant\Persistence\MerchantRepositoryInterface $repository
+     * @var array<\Spryker\Zed\MerchantExtension\Dependency\Plugin\MerchantExpanderPluginInterface>
      */
-    public function __construct(MerchantRepositoryInterface $repository)
+    protected $merchantExpanderPlugins;
+
+    /**
+     * @param \Spryker\Zed\Merchant\Persistence\MerchantRepositoryInterface $repository
+     * @param array<\Spryker\Zed\MerchantExtension\Dependency\Plugin\MerchantExpanderPluginInterface> $merchantExpanderPlugins
+     */
+    public function __construct(MerchantRepositoryInterface $repository, array $merchantExpanderPlugins)
     {
         $this->repository = $repository;
+        $this->merchantExpanderPlugins = $merchantExpanderPlugins;
     }
 
     /**
@@ -55,5 +63,34 @@ class MerchantReader implements MerchantReaderInterface
         $merchantTransfer->requireIdMerchant();
 
         return $this->repository->getMerchantById($merchantTransfer->getIdMerchant());
+    }
+
+    /**
+     * @param \Generated\Shared\Transfer\MerchantCriteriaTransfer $merchantCriteriaTransfer
+     *
+     * @return \Generated\Shared\Transfer\MerchantTransfer|null
+     */
+    public function findOne(MerchantCriteriaTransfer $merchantCriteriaTransfer): ?MerchantTransfer
+    {
+        $merchantTransfer = $this->merchantRepository->findOne($merchantCriteriaTransfer);
+        if ($merchantTransfer === null) {
+            return null;
+        }
+
+        return $this->executeMerchantExpanderPlugins($merchantTransfer);
+    }
+
+    /**
+     * @param \Generated\Shared\Transfer\MerchantTransfer $merchantTransfer
+     *
+     * @return \Generated\Shared\Transfer\MerchantTransfer
+     */
+    protected function executeMerchantExpanderPlugins(MerchantTransfer $merchantTransfer): MerchantTransfer
+    {
+        foreach ($this->merchantExpanderPlugins as $merchantExpanderPlugin) {
+            $merchantTransfer = $merchantExpanderPlugin->expand($merchantTransfer);
+        }
+
+        return $merchantTransfer;
     }
 }

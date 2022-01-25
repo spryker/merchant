@@ -8,6 +8,7 @@
 namespace Spryker\Zed\Merchant\Persistence;
 
 use Generated\Shared\Transfer\MerchantCollectionTransfer;
+use Generated\Shared\Transfer\MerchantCriteriaTransfer;
 use Generated\Shared\Transfer\MerchantTransfer;
 
 interface MerchantRepositoryInterface
@@ -41,4 +42,11 @@ interface MerchantRepositoryInterface
      * @return bool
      */
     public function hasKey(string $key): bool;
+
+    /**
+     * @param \Generated\Shared\Transfer\MerchantCriteriaTransfer $merchantCriteriaTransfer
+     *
+     * @return \Generated\Shared\Transfer\MerchantTransfer|null
+     */
+    public function findOne(MerchantCriteriaTransfer $merchantCriteriaTransfer): ?MerchantTransfer;
 }
