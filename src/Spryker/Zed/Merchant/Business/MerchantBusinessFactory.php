@@ -41,7 +41,8 @@ class MerchantBusinessFactory extends AbstractBusinessFactory
     public function createMerchantReader(): MerchantReaderInterface
     {
         return new MerchantReader(
-            $this->getRepository()
+            $this->getRepository(),
+            $this->getMerchantExpanderPlugins()
         );
     }
 
@@ -62,5 +63,14 @@ class MerchantBusinessFactory extends AbstractBusinessFactory
     public function getUtilTextService(): MerchantToUtilTextServiceInterface
     {
         return $this->getProvidedDependency(MerchantDependencyProvider::SERVICE_UTIL_TEXT);
+    }
+
+
+    /**
+     * @return array<\Spryker\Zed\MerchantExtension\Dependency\Plugin\MerchantExpanderPluginInterface>
+     */
+    public function getMerchantExpanderPlugins(): MerchantToUtilTextServiceInterface
+    {
+        return $this->getProvidedDependency(MerchantDependencyProvider::PLUGINS_MERCHANT_EXPANDER);
     }
 }

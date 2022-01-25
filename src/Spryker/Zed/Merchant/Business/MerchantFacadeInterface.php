@@ -99,8 +99,9 @@ interface MerchantFacadeInterface
 
     /**
      * Specification:
-     * - Returns merchant which can filtered by merchant id and email.
-     * - Returns MerchantTransfer if found, NULL otherwise.
+     * - Returns merchant which can filtered by merchant id.
+     * - Executes a stack of {@link \Spryker\Zed\MerchantExtension\Dependency\Plugin\MerchantExpanderPluginInterface} plugins.
+     * - Returns `MerchantTransfer` if found, NULL otherwise.
      *
      * @api
      *
