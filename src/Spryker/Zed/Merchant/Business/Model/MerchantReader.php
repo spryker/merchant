@@ -72,7 +72,7 @@ class MerchantReader implements MerchantReaderInterface
      */
     public function findOne(MerchantCriteriaTransfer $merchantCriteriaTransfer): ?MerchantTransfer
     {
-        $merchantTransfer = $this->merchantRepository->findOne($merchantCriteriaTransfer);
+        $merchantTransfer = $this->repository->findOne($merchantCriteriaTransfer);
         if ($merchantTransfer === null) {
             return null;
         }
