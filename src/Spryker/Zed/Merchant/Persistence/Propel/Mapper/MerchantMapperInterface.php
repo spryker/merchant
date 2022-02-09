@@ -20,23 +20,23 @@ interface MerchantMapperInterface
 {
     /**
      * @param \Generated\Shared\Transfer\MerchantTransfer $merchantTransfer
-     * @param \Orm\Zed\Merchant\Persistence\SpyMerchant $merchantEntity
+     * @param \Orm\Zed\Merchant\Persistence\SpyMerchant $spyMerchant
      *
      * @return \Orm\Zed\Merchant\Persistence\SpyMerchant
      */
     public function mapMerchantTransferToMerchantEntity(
         MerchantTransfer $merchantTransfer,
-        SpyMerchant $merchantEntity
+        SpyMerchant $spyMerchant
     ): SpyMerchant;
 
     /**
-     * @param \Orm\Zed\Merchant\Persistence\SpyMerchant $merchantEntity
+     * @param \Orm\Zed\Merchant\Persistence\SpyMerchant $spyMerchant
      * @param \Generated\Shared\Transfer\MerchantTransfer $merchantTransfer
      *
      * @return \Generated\Shared\Transfer\MerchantTransfer
      */
     public function mapMerchantEntityToMerchantTransfer(
-        SpyMerchant $merchantEntity,
+        SpyMerchant $spyMerchant,
         MerchantTransfer $merchantTransfer
     ): MerchantTransfer;
 
