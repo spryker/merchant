@@ -53,4 +53,9 @@ class MerchantPersistenceFactory extends AbstractPersistenceFactory
     {
         return $this->getProvidedDependency(MerchantDependencyProvider::PROPEL_QUERY_URL);
     }
+
+    protected function getMerchantMapper(): MerchantMapperInterface
+    {
+        return $this->createPropelMerchantMapper();
+    }
 }
