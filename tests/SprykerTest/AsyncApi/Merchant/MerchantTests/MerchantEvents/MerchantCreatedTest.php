@@ -5,7 +5,7 @@
  * Use of this software requires acceptance of the Evaluation License Agreement. See LICENSE file.
  */
 
-namespace SprykerTest\AsyncApi\Merchant\MerchantTests\MerchantCommands;
+namespace SprykerTest\AsyncApi\Merchant\MerchantTests\MerchantEvents;
 
 use Codeception\Test\Unit;
 use Generated\Shared\Transfer\MerchantCreatedTransfer;
@@ -19,7 +19,7 @@ use SprykerTest\AsyncApi\Merchant\AsyncApiTester;
  * @group AsyncApi
  * @group Merchant
  * @group MerchantTests
- * @group MerchantCommands
+ * @group MerchantEvents
  * @group MerchantCreatedTest
  * Add your own group annotations below this line
  */

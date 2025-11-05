@@ -82,7 +82,7 @@ class MerchantHelper extends Module
         $seedData = array_merge([
             MerchantTransfer::STATUS => static::STATUS_APPROVED,
             MerchantTransfer::IS_ACTIVE => true,
-            MerchantTransfer::STORE_RELATION => $this->getStoreRelationTransfer()->toArray(),
+            MerchantTransfer::STORE_RELATION => $this->getStoreRelationTransfer($seedData[MerchantTransfer::STORE_RELATION] ?? [])->toArray(),
             MerchantTransfer::MERCHANT_PROFILE => $this->buildMerchantProfileTransfer()->toArray(),
         ], $seedData);
 
@@ -92,24 +92,29 @@ class MerchantHelper extends Module
     /**
      * @return \Generated\Shared\Transfer\MerchantTransfer
      */
-    public function haveMerchantWithStore(): MerchantTransfer
+    public function haveMerchantWithStore(array $seedData = []): MerchantTransfer
     {
-        $storeRelationTransfer = $this->getStoreRelationTransfer();
+        $storeRelationTransfer = $this->getStoreRelationTransfer($seedData);
 
         return $this->haveMerchant([MerchantTransfer::STORE_RELATION => $storeRelationTransfer->toArray()]);
     }
 
     /**
-     * @return \Generated\Shared\Transfer\StoreRelationTransfer
+     * @param array $seedData
+     *
+     * @return \Generated\Shared\Transfer\StoreTransfer
      */
-    public function getStoreRelationTransfer(): StoreRelationTransfer
+    public function getStoreRelationTransfer(array $seedData = []): StoreRelationTransfer
     {
-        $storeTransfer = $this->getStoreDataHelper()->haveStore([StoreTransfer::NAME => 'DE']);
-        $storeRelationTransfer = (new StoreRelationBuilder())->seed([
-            StoreRelationTransfer::ID_STORES => [$storeTransfer->getIdStore()],
-        ])->build();
+        $idStores = $seedData[StoreRelationTransfer::ID_STORES] ?? [];
 
-        return $storeRelationTransfer;
+        if (!$idStores) {
+            $idStores[] = $this->getStoreDataHelper()->haveStore([StoreTransfer::NAME => 'DE'])->getIdStoreOrFail();
+        }
+
+        return (new StoreRelationBuilder())->seed([
+                StoreRelationTransfer::ID_STORES => $idStores,
+            ])->build();
     }
 
     /**
