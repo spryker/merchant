@@ -46,6 +46,7 @@ class MerchantExportMerchantsMessageHandlerPlugin extends AbstractPlugin impleme
      */
     public function handles(): iterable
     {
+        /** @phpstan-ignore generator.returnType */
         yield ExportMerchantsTransfer::class => [$this, 'onExportMerchants'];
     }
 }

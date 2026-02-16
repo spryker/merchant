@@ -200,7 +200,7 @@ class MerchantDependencyProvider extends AbstractBundleDependencyProvider
     /**
      * @deprecated Use {@link \Spryker\Zed\Merchant\MerchantDependencyProvider::getMerchantBulkExpanderPlugins()} instead.
      *
-     * @return array<\Spryker\Zed\MerchantExtension\Dependency\Plugin\MerchantExpanderPluginInterface>
+     * @return list<\Spryker\Zed\MerchantExtension\Dependency\Plugin\MerchantExpanderPluginInterface>
      */
     protected function getMerchantExpanderPlugins(): array
     {

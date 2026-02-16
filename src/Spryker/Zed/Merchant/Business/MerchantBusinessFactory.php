@@ -136,7 +136,7 @@ class MerchantBusinessFactory extends AbstractBusinessFactory
     /**
      * @deprecated Use {@link \Spryker\Zed\Merchant\Business\MerchantBusinessFactory::getMerchantBulkExpanderPlugins()} instead.
      *
-     * @return array<\Spryker\Zed\MerchantExtension\Dependency\Plugin\MerchantExpanderPluginInterface>
+     * @return list<\Spryker\Zed\MerchantExtension\Dependency\Plugin\MerchantExpanderPluginInterface>
      */
     public function getMerchantExpanderPlugins(): array
     {

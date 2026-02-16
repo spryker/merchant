@@ -11,9 +11,6 @@ use Spryker\Client\Kernel\AbstractFactory;
 use Spryker\Client\Merchant\Mapper\MerchantShoppingListItemToItemMapper;
 use Spryker\Client\Merchant\Mapper\MerchantShoppingListItemToItemMapperInterface;
 
-/**
- * @method \Spryker\Client\Merchant\MerchantConfig getConfig()
- */
 class MerchantFactory extends AbstractFactory
 {
     /**
