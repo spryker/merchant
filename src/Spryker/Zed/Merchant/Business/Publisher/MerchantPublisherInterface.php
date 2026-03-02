@@ -14,10 +14,5 @@ use Generated\Shared\Transfer\MerchantPublisherConfigTransfer;
  */
 interface MerchantPublisherInterface
 {
-    /**
-     * @param \Generated\Shared\Transfer\MerchantPublisherConfigTransfer $merchantPublisherConfigTransfer
-     *
-     * @return void
-     */
     public function publish(MerchantPublisherConfigTransfer $merchantPublisherConfigTransfer): void;
 }

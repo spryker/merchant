@@ -32,11 +32,6 @@ class MerchantReader implements MerchantReaderInterface
      */
     private MerchantExpanderInterface $merchantExpander;
 
-    /**
-     * @param \Spryker\Zed\Merchant\Persistence\MerchantRepositoryInterface $merchantRepository
-     * @param \Spryker\Zed\Merchant\Dependency\Facade\MerchantToStoreFacadeInterface $storeFacade
-     * @param \Spryker\Zed\Merchant\Business\Expander\MerchantExpanderInterface $merchantExpander
-     */
     public function __construct(
         MerchantRepositoryInterface $merchantRepository,
         MerchantToStoreFacadeInterface $storeFacade,
@@ -47,11 +42,6 @@ class MerchantReader implements MerchantReaderInterface
         $this->merchantExpander = $merchantExpander;
     }
 
-    /**
-     * @param \Generated\Shared\Transfer\MerchantCriteriaTransfer $merchantCriteriaTransfer
-     *
-     * @return \Generated\Shared\Transfer\MerchantCollectionTransfer
-     */
     public function get(MerchantCriteriaTransfer $merchantCriteriaTransfer): MerchantCollectionTransfer
     {
         $merchantCollectionTransfer = $this->merchantRepository->get($merchantCriteriaTransfer);
@@ -62,11 +52,6 @@ class MerchantReader implements MerchantReaderInterface
         return $merchantCollectionTransfer;
     }
 
-    /**
-     * @param \Generated\Shared\Transfer\MerchantCriteriaTransfer $merchantCriteriaTransfer
-     *
-     * @return \Generated\Shared\Transfer\MerchantTransfer|null
-     */
     public function findOne(MerchantCriteriaTransfer $merchantCriteriaTransfer): ?MerchantTransfer
     {
         $merchantTransfer = $this->merchantRepository->findOne($merchantCriteriaTransfer);
@@ -77,11 +62,6 @@ class MerchantReader implements MerchantReaderInterface
         return $this->expandMerchant($merchantTransfer);
     }
 
-    /**
-     * @param \Generated\Shared\Transfer\MerchantCollectionTransfer $merchantCollectionTransfer
-     *
-     * @return \Generated\Shared\Transfer\MerchantCollectionTransfer
-     */
     protected function expandMerchantCollection(MerchantCollectionTransfer $merchantCollectionTransfer): MerchantCollectionTransfer
     {
         $merchantIds = $this->getMerchantIds($merchantCollectionTransfer);
@@ -101,11 +81,6 @@ class MerchantReader implements MerchantReaderInterface
         return $this->merchantExpander->expand($merchantCollectionTransfer);
     }
 
-    /**
-     * @param \Generated\Shared\Transfer\MerchantTransfer $merchantTransfer
-     *
-     * @return \Generated\Shared\Transfer\MerchantTransfer
-     */
     protected function expandMerchant(MerchantTransfer $merchantTransfer): MerchantTransfer
     {
         /** @var int $idMerchant */

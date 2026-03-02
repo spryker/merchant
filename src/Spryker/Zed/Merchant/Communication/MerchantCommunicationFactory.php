@@ -21,17 +21,11 @@ use Spryker\Zed\Merchant\Communication\Plugin\Checkout\Validator\MerchantCheckou
  */
 class MerchantCommunicationFactory extends AbstractCommunicationFactory
 {
-    /**
-     * @return \Spryker\Zed\Merchant\Communication\Plugin\Cart\Validator\MerchantCartValidatorInterface
-     */
     public function createMerchantCartValidator(): MerchantCartValidatorInterface
     {
         return new MerchantCartValidator($this->getFacade());
     }
 
-    /**
-     * @return \Spryker\Zed\Merchant\Communication\Plugin\Checkout\Validator\MerchantCheckoutValidatorInterface
-     */
     public function createMerchantCheckoutValidator(): MerchantCheckoutValidatorInterface
     {
         return new MerchantCheckoutValidator($this->getFacade());

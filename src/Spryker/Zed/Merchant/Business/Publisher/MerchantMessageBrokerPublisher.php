@@ -49,12 +49,6 @@ class MerchantMessageBrokerPublisher implements MerchantPublisherInterface
      */
     protected MerchantConfig $merchantConfig;
 
-    /**
-     * @param \Spryker\Zed\Merchant\Dependency\Facade\MerchantToMessageBrokerFacadeInterface $messageBrokerFacade
-     * @param \Spryker\Zed\Merchant\Business\Reader\MerchantReaderInterface $merchantReader
-     * @param \Spryker\Zed\Merchant\Business\Mapper\TransferMapperInterface $merchantMapper
-     * @param \Spryker\Zed\Merchant\MerchantConfig $merchantConfig
-     */
     public function __construct(
         MerchantToMessageBrokerFacadeInterface $messageBrokerFacade,
         MerchantReaderInterface $merchantReader,
@@ -67,11 +61,6 @@ class MerchantMessageBrokerPublisher implements MerchantPublisherInterface
         $this->merchantConfig = $merchantConfig;
     }
 
-    /**
-     * @param \Generated\Shared\Transfer\MerchantPublisherConfigTransfer $merchantPublisherConfigTransfer
-     *
-     * @return void
-     */
     public function publish(MerchantPublisherConfigTransfer $merchantPublisherConfigTransfer): void
     {
         $this->assertEventNameIsAllowedForPublish($merchantPublisherConfigTransfer);
@@ -99,11 +88,6 @@ class MerchantMessageBrokerPublisher implements MerchantPublisherInterface
         }
     }
 
-    /**
-     * @param \Generated\Shared\Transfer\MerchantPublisherConfigTransfer $merchantPublisherConfigTransfer
-     *
-     * @return void
-     */
     protected function performMerchantPublish(MerchantPublisherConfigTransfer $merchantPublisherConfigTransfer): void
     {
         $merchantCriteriaTransfer = (new MerchantCriteriaTransfer())->setMerchantIds($merchantPublisherConfigTransfer->getMerchantIds());
@@ -118,12 +102,6 @@ class MerchantMessageBrokerPublisher implements MerchantPublisherInterface
         $this->publishMerchantMessages($merchantCollectionTransfer, $merchantPublisherConfigTransfer->getEventNameOrFail());
     }
 
-    /**
-     * @param \Generated\Shared\Transfer\MerchantCollectionTransfer $merchantCollectionTransfer
-     * @param string $publishTransferClass
-     *
-     * @return void
-     */
     protected function publishMerchantMessages(MerchantCollectionTransfer $merchantCollectionTransfer, string $publishTransferClass): void
     {
         foreach ($merchantCollectionTransfer->getMerchants() as $merchantTransfer) {
@@ -146,12 +124,6 @@ class MerchantMessageBrokerPublisher implements MerchantPublisherInterface
         }
     }
 
-    /**
-     * @param \Generated\Shared\Transfer\MerchantTransfer $merchantTransfer
-     * @param string $publishTransferClass
-     *
-     * @return \Spryker\Shared\Kernel\Transfer\TransferInterface
-     */
     protected function createPublishTransfer(MerchantTransfer $merchantTransfer, string $publishTransferClass): TransferInterface
     {
         /** @var \Generated\Shared\Transfer\MerchantExportedTransfer|\Generated\Shared\Transfer\MerchantCreatedTransfer|\Generated\Shared\Transfer\MerchantUpdatedTransfer $publishTransfer */

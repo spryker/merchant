@@ -35,9 +35,6 @@ class ExportMerchantsTest extends Unit
      */
     protected AsyncApiTester $tester;
 
-    /**
-     * @return void
-     */
     public function testExportMerchantsMessageTriggersEventFacadeTriggerBulkMethodWithMerchantsToExport(): void
     {
         $merchantTransfersTheExportWasTriggeredFor = [];

@@ -45,19 +45,11 @@ class MerchantBusinessTester extends Actor
 {
     use _generated\MerchantBusinessTesterActions;
 
-    /**
-     * @return void
-     */
     public function truncateMerchantRelations(): void
     {
         $this->truncateTableRelations($this->getMerchantQuery());
     }
 
-    /**
-     * @param int|null $merchantId
-     *
-     * @return \Generated\Shared\Transfer\MerchantTransfer
-     */
     public function createMerchantTransfer(?int $merchantId = null): MerchantTransfer
     {
         return (new MerchantBuilder())
@@ -66,12 +58,6 @@ class MerchantBusinessTester extends Actor
             ->setStoreRelation((new StoreRelationBuilder())->build());
     }
 
-    /**
-     * @param int $merchantId
-     * @param int $price
-     *
-     * @return \Generated\Shared\Transfer\PriceProductMerchantRelationshipStorageTransfer
-     */
     public function createPriceProductMerchantRelationshipStorageTransfer(int $merchantId, int $price): PriceProductMerchantRelationshipStorageTransfer
     {
         $ungroupedPrices = new ArrayObject();
@@ -85,53 +71,31 @@ class MerchantBusinessTester extends Actor
             ->setUngroupedPrices($ungroupedPrices);
     }
 
-    /**
-     * @return \Orm\Zed\Merchant\Persistence\SpyMerchantQuery
-     */
     protected function getMerchantQuery(): SpyMerchantQuery
     {
         return SpyMerchantQuery::create();
     }
 
-    /**
-     * @param int $numberOfInvokations
-     *
-     * @return \PHPUnit\Framework\MockObject\Rule\InvokedCount
-     */
     protected function exactly(int $numberOfInvokations): InvokedCountMatcher
     {
         return new InvokedCountMatcher($numberOfInvokations);
     }
 
-    /**
-     * @return \PHPUnit\Framework\MockObject\Rule\InvokedAtLeastOnce
-     */
     public static function atLeastOnce(): InvokedAtLeastOnceMatcher
     {
         return new InvokedAtLeastOnceMatcher();
     }
 
-    /**
-     * @param callable $callback
-     *
-     * @return \PHPUnit\Framework\Constraint\Callback
-     */
     protected static function callback(callable $callback): Callback
     {
         return new Callback($callback);
     }
 
-    /**
-     * @return \Spryker\Zed\Store\Business\StoreFacadeInterface
-     */
     public function getStoreFacade(): StoreFacadeInterface
     {
         return $this->getLocator()->store()->facade();
     }
 
-    /**
-     * @return \Generated\Shared\Transfer\MerchantTransfer
-     */
     public function haveMerchantWithStore(): MerchantTransfer
     {
         $storeRelationTransfer = $this->getStoreRelationTransfer();
@@ -141,9 +105,6 @@ class MerchantBusinessTester extends Actor
         return $this->getFacade()->findOne((new MerchantCriteriaTransfer())->setIdMerchant($merchantTransfer->getIdMerchant()));
     }
 
-    /**
-     * @return \Generated\Shared\Transfer\MerchantTransfer
-     */
     public function getMerchantTransferWithStore(): MerchantTransfer
     {
         $storeRelationTransfer = $this->getStoreRelationTransfer();
@@ -176,12 +137,6 @@ class MerchantBusinessTester extends Actor
             ));
     }
 
-    /**
-     * @param \Spryker\Zed\Event\Business\EventFacadeInterface $eventFacade
-     * @param \Generated\Shared\Transfer\MerchantTransfer $merchantTransfer
-     *
-     * @return void
-     */
     public function assertTriggerCreatedAndPublishEvent(EventFacadeInterface $eventFacade, MerchantTransfer $merchantTransfer): void
     {
         $eventFacade
@@ -205,12 +160,6 @@ class MerchantBusinessTester extends Actor
             });
     }
 
-    /**
-     * @param \Spryker\Zed\Event\Business\EventFacadeInterface $eventFacade
-     * @param \Generated\Shared\Transfer\MerchantTransfer $merchantTransfer
-     *
-     * @return void
-     */
     public function assertTriggerUpdatedAndPublishEvent(EventFacadeInterface $eventFacade, MerchantTransfer $merchantTransfer): void
     {
         $eventFacade
@@ -233,12 +182,6 @@ class MerchantBusinessTester extends Actor
             });
     }
 
-    /**
-     * @param \Spryker\Zed\Event\Business\EventFacadeInterface $eventFacade
-     * @param \Generated\Shared\Transfer\MerchantTransfer $merchantTransfer
-     *
-     * @return void
-     */
     public function assertTriggerOnlyPublishEvent(EventFacadeInterface $eventFacade, MerchantTransfer $merchantTransfer): void
     {
         $eventFacade
@@ -252,9 +195,6 @@ class MerchantBusinessTester extends Actor
             }));
     }
 
-    /**
-     * @return \Generated\Shared\Transfer\StoreRelationTransfer
-     */
     public function getStoreRelationTransfer(): StoreRelationTransfer
     {
         $storeTransfer = $this->haveStore([StoreTransfer::NAME => 'DE']);
@@ -265,9 +205,6 @@ class MerchantBusinessTester extends Actor
         return $storeRelationTransfer;
     }
 
-    /**
-     * @return array
-     */
     public function getStoreReferences(): array
     {
         $storeReferences = [];

@@ -28,11 +28,6 @@ class MerchantRepository extends AbstractRepository implements MerchantRepositor
 {
     protected const DEFAULT_ORDER_COLUMN = SpyMerchantTableMap::COL_NAME;
 
-    /**
-     * @param \Generated\Shared\Transfer\MerchantCriteriaTransfer $merchantCriteriaTransfer
-     *
-     * @return \Generated\Shared\Transfer\MerchantCollectionTransfer
-     */
     public function get(MerchantCriteriaTransfer $merchantCriteriaTransfer): MerchantCollectionTransfer
     {
         $merchantQuery = $this->getFactory()->createMerchantQuery();
@@ -57,11 +52,6 @@ class MerchantRepository extends AbstractRepository implements MerchantRepositor
         return $merchantCollectionTransfer;
     }
 
-    /**
-     * @param \Generated\Shared\Transfer\MerchantCriteriaTransfer $merchantCriteriaTransfer
-     *
-     * @return \Generated\Shared\Transfer\MerchantTransfer|null
-     */
     public function findOne(MerchantCriteriaTransfer $merchantCriteriaTransfer): ?MerchantTransfer
     {
         $merchantQuery = $this->getFactory()->createMerchantQuery();
@@ -150,12 +140,6 @@ class MerchantRepository extends AbstractRepository implements MerchantRepositor
         return $merchantUrlTransfersMap;
     }
 
-    /**
-     * @param \Orm\Zed\Merchant\Persistence\SpyMerchantQuery $merchantQuery
-     * @param \Generated\Shared\Transfer\MerchantCriteriaTransfer $merchantCriteriaTransfer
-     *
-     * @return \Orm\Zed\Merchant\Persistence\SpyMerchantQuery
-     */
     protected function applyFilters(SpyMerchantQuery $merchantQuery, MerchantCriteriaTransfer $merchantCriteriaTransfer): SpyMerchantQuery
     {
         if ($merchantCriteriaTransfer->getIdMerchant() !== null) {

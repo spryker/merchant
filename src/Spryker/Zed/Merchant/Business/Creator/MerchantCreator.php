@@ -79,11 +79,6 @@ class MerchantCreator implements MerchantCreatorInterface
         $this->merchantEventTrigger = $merchantEventTrigger;
     }
 
-    /**
-     * @param \Generated\Shared\Transfer\MerchantTransfer $merchantTransfer
-     *
-     * @return \Generated\Shared\Transfer\MerchantResponseTransfer
-     */
     public function create(MerchantTransfer $merchantTransfer): MerchantResponseTransfer
     {
         $this->assertDefaultMerchantRequirements($merchantTransfer);
@@ -112,11 +107,6 @@ class MerchantCreator implements MerchantCreatorInterface
         return $merchantResponseTransfer;
     }
 
-    /**
-     * @param \Generated\Shared\Transfer\MerchantTransfer $merchantTransfer
-     *
-     * @return \Generated\Shared\Transfer\MerchantTransfer
-     */
     protected function executeCreateTransaction(MerchantTransfer $merchantTransfer): MerchantTransfer
     {
         $storeRelationTransfer = $merchantTransfer->getStoreRelation();
@@ -135,11 +125,6 @@ class MerchantCreator implements MerchantCreatorInterface
         return $merchantTransfer;
     }
 
-    /**
-     * @param \Generated\Shared\Transfer\MerchantTransfer $merchantTransfer
-     *
-     * @return \Generated\Shared\Transfer\MerchantTransfer
-     */
     protected function createMerchantStores(MerchantTransfer $merchantTransfer): MerchantTransfer
     {
         /** @var \Generated\Shared\Transfer\StoreRelationTransfer $storeRelationTransfer */
@@ -170,9 +155,6 @@ class MerchantCreator implements MerchantCreatorInterface
         return $merchantTransfer;
     }
 
-    /**
-     * @return \Generated\Shared\Transfer\MerchantResponseTransfer
-     */
     protected function createMerchantResponseTransfer(): MerchantResponseTransfer
     {
         return (new MerchantResponseTransfer())
@@ -198,11 +180,6 @@ class MerchantCreator implements MerchantCreatorInterface
         return $merchantTransfer;
     }
 
-    /**
-     * @param \Generated\Shared\Transfer\MerchantTransfer $merchantTransfer
-     *
-     * @return void
-     */
     protected function assertDefaultMerchantRequirements(MerchantTransfer $merchantTransfer): void
     {
         $merchantTransfer
@@ -211,11 +188,6 @@ class MerchantCreator implements MerchantCreatorInterface
             ->requireStoreRelation();
     }
 
-    /**
-     * @param \Generated\Shared\Transfer\MerchantTransfer $merchantTransfer
-     *
-     * @return void
-     */
     protected function triggerPublishEvent(MerchantTransfer $merchantTransfer): void
     {
         $eventEntityTransfer = new EventEntityTransfer();

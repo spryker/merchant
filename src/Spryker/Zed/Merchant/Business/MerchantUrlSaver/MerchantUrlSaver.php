@@ -19,19 +19,11 @@ class MerchantUrlSaver implements MerchantUrlSaverInterface
      */
     protected $urlFacade;
 
-    /**
-     * @param \Spryker\Zed\Merchant\Dependency\Facade\MerchantToUrlFacadeInterface $urlFacade
-     */
     public function __construct(MerchantToUrlFacadeInterface $urlFacade)
     {
         $this->urlFacade = $urlFacade;
     }
 
-    /**
-     * @param \Generated\Shared\Transfer\MerchantTransfer $merchantTransfer
-     *
-     * @return \Generated\Shared\Transfer\MerchantTransfer
-     */
     public function saveMerchantUrls(MerchantTransfer $merchantTransfer): MerchantTransfer
     {
         $urlTransferCollection = new ArrayObject();
@@ -49,11 +41,6 @@ class MerchantUrlSaver implements MerchantUrlSaverInterface
         return $merchantTransfer;
     }
 
-    /**
-     * @param \Generated\Shared\Transfer\UrlTransfer $urlTransfer
-     *
-     * @return \Generated\Shared\Transfer\UrlTransfer
-     */
     protected function saveMerchantUrl(UrlTransfer $urlTransfer): UrlTransfer
     {
         if ($urlTransfer->getIdUrl() === null) {

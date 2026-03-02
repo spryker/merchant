@@ -41,11 +41,6 @@ class MerchantExporter implements MerchantExporterInterface
      */
     protected MerchantRepositoryInterface $merchantRepository;
 
-    /**
-     * @param \Spryker\Zed\Merchant\Dependency\Facade\MerchantToEventFacadeInterface $eventFacade
-     * @param \Spryker\Zed\Merchant\Dependency\Facade\MerchantToStoreFacadeInterface $storeFacade
-     * @param \Spryker\Zed\Merchant\Persistence\MerchantRepositoryInterface $merchantRepository
-     */
     public function __construct(
         MerchantToEventFacadeInterface $eventFacade,
         MerchantToStoreFacadeInterface $storeFacade,
@@ -56,11 +51,6 @@ class MerchantExporter implements MerchantExporterInterface
         $this->merchantRepository = $merchantRepository;
     }
 
-    /**
-     * @param \Generated\Shared\Transfer\MerchantExportCriteriaTransfer $merchantExportCriteriaTransfer
-     *
-     * @return void
-     */
     public function export(MerchantExportCriteriaTransfer $merchantExportCriteriaTransfer): void
     {
         if (!$this->isMerchantExportCriteriaStoreReferenceValid($merchantExportCriteriaTransfer)) {
@@ -87,11 +77,6 @@ class MerchantExporter implements MerchantExporterInterface
         $this->eventFacade->triggerBulk(MerchantEvents::MERCHANT_EXPORTED, $eventEntityTransfers);
     }
 
-    /**
-     * @param \Generated\Shared\Transfer\MerchantExportCriteriaTransfer $merchantExportCriteriaTransfer
-     *
-     * @return bool
-     */
     protected function isMerchantExportCriteriaStoreReferenceValid(
         MerchantExportCriteriaTransfer $merchantExportCriteriaTransfer
     ): bool {
@@ -113,11 +98,6 @@ class MerchantExporter implements MerchantExporterInterface
         return true;
     }
 
-    /**
-     * @param \Generated\Shared\Transfer\MerchantExportCriteriaTransfer $merchantExportCriteriaTransfer
-     *
-     * @return \Generated\Shared\Transfer\StoreTransfer|null
-     */
     protected function findStoreForExporting(
         MerchantExportCriteriaTransfer $merchantExportCriteriaTransfer
     ): ?StoreTransfer {
@@ -128,11 +108,6 @@ class MerchantExporter implements MerchantExporterInterface
         return $this->getStoreTransfer($merchantExportCriteriaTransfer);
     }
 
-    /**
-     * @param \Generated\Shared\Transfer\MerchantExportCriteriaTransfer $merchantExportCriteriaTransfer
-     *
-     * @return \Generated\Shared\Transfer\StoreTransfer
-     */
     protected function getStoreTransfer(MerchantExportCriteriaTransfer $merchantExportCriteriaTransfer): StoreTransfer
     {
         return $this->storeFacade->getStoreByStoreReference($merchantExportCriteriaTransfer->getStoreReferenceOrFail());

@@ -30,9 +30,6 @@ class MerchantUpdatedTest extends Unit
      */
     protected AsyncApiTester $tester;
 
-    /**
-     * @return void
-     */
     public function testMerchantUpdatedMessageIsEmittedWhenMerchantsAreUpdated(): void
     {
         // Arrange

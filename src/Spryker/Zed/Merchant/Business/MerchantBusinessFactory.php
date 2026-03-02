@@ -46,9 +46,6 @@ use Spryker\Zed\Merchant\MerchantDependencyProvider;
  */
 class MerchantBusinessFactory extends AbstractBusinessFactory
 {
-    /**
-     * @return \Spryker\Zed\Merchant\Business\Creator\MerchantCreatorInterface
-     */
     public function createMerchantCreator(): MerchantCreatorInterface
     {
         return new MerchantCreator(
@@ -61,9 +58,6 @@ class MerchantBusinessFactory extends AbstractBusinessFactory
         );
     }
 
-    /**
-     * @return \Spryker\Zed\Merchant\Business\Updater\MerchantUpdaterInterface
-     */
     public function createMerchantUpdater(): MerchantUpdaterInterface
     {
         return new MerchantUpdater(
@@ -77,9 +71,6 @@ class MerchantBusinessFactory extends AbstractBusinessFactory
         );
     }
 
-    /**
-     * @return \Spryker\Zed\Merchant\Business\Reader\MerchantReaderInterface
-     */
     public function createMerchantReader(): MerchantReaderInterface
     {
         return new MerchantReader(
@@ -89,9 +80,6 @@ class MerchantBusinessFactory extends AbstractBusinessFactory
         );
     }
 
-    /**
-     * @return \Spryker\Zed\Merchant\Business\Status\MerchantStatusReaderInterface
-     */
     public function createMerchantStatusReader(): MerchantStatusReaderInterface
     {
         return new MerchantStatusReader(
@@ -99,9 +87,6 @@ class MerchantBusinessFactory extends AbstractBusinessFactory
         );
     }
 
-    /**
-     * @return \Spryker\Zed\Merchant\Business\Status\MerchantStatusValidatorInterface
-     */
     public function createMerchantStatusValidator(): MerchantStatusValidatorInterface
     {
         return new MerchantStatusValidator(
@@ -109,9 +94,6 @@ class MerchantBusinessFactory extends AbstractBusinessFactory
         );
     }
 
-    /**
-     * @return \Spryker\Zed\Merchant\Dependency\Service\MerchantToUtilTextServiceInterface
-     */
     public function getUtilTextService(): MerchantToUtilTextServiceInterface
     {
         return $this->getProvidedDependency(MerchantDependencyProvider::SERVICE_UTIL_TEXT);
@@ -151,17 +133,11 @@ class MerchantBusinessFactory extends AbstractBusinessFactory
         return $this->getProvidedDependency(MerchantDependencyProvider::PLUGINS_MERCHANT_BULK_EXPANDER);
     }
 
-    /**
-     * @return \Spryker\Zed\Merchant\Dependency\Facade\MerchantToUrlFacadeInterface
-     */
     public function getUrlFacade(): MerchantToUrlFacadeInterface
     {
         return $this->getProvidedDependency(MerchantDependencyProvider::FACADE_URL);
     }
 
-    /**
-     * @return \Spryker\Zed\Merchant\Business\MerchantUrlSaver\MerchantUrlSaverInterface
-     */
     public function createMerchantUrlSaver(): MerchantUrlSaverInterface
     {
         return new MerchantUrlSaver(
@@ -169,17 +145,11 @@ class MerchantBusinessFactory extends AbstractBusinessFactory
         );
     }
 
-    /**
-     * @return \Spryker\Zed\Merchant\Dependency\Facade\MerchantToEventFacadeInterface
-     */
     public function getEventFacade(): MerchantToEventFacadeInterface
     {
         return $this->getProvidedDependency(MerchantDependencyProvider::FACADE_EVENT);
     }
 
-    /**
-     * @return \Spryker\Zed\Merchant\Business\Filter\PriceProductMerchantRelationshipStorageFilterInterface
-     */
     public function createPriceProductMerchantRelationshipStorageFilter(): PriceProductMerchantRelationshipStorageFilterInterface
     {
         return new PriceProductMerchantRelationshipStorageFilter($this->getRepository());
@@ -234,17 +204,11 @@ class MerchantBusinessFactory extends AbstractBusinessFactory
         );
     }
 
-    /**
-     * @return \Spryker\Zed\Merchant\Business\Trigger\MerchantEventTriggerInterface
-     */
     public function createMerchantEventTrigger(): MerchantEventTriggerInterface
     {
         return new MerchantEventTrigger($this->getEventFacade());
     }
 
-    /**
-     * @return \Spryker\Zed\Merchant\Business\Expander\MerchantExpanderInterface
-     */
     public function createMerchantExpander(): MerchantExpanderInterface
     {
         return new MerchantExpander(
@@ -253,9 +217,6 @@ class MerchantBusinessFactory extends AbstractBusinessFactory
         );
     }
 
-    /**
-     * @return \Spryker\Zed\Merchant\Dependency\Facade\MerchantToStoreFacadeInterface
-     */
     public function getStoreFacade(): MerchantToStoreFacadeInterface
     {
         return $this->getProvidedDependency(MerchantDependencyProvider::FACADE_STORE);

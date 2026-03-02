@@ -99,11 +99,6 @@ class MerchantUpdater implements MerchantUpdaterInterface
         $this->merchantEventTrigger = $merchantEventTrigger;
     }
 
-    /**
-     * @param \Generated\Shared\Transfer\MerchantTransfer $merchantTransfer
-     *
-     * @return \Generated\Shared\Transfer\MerchantResponseTransfer
-     */
     public function update(MerchantTransfer $merchantTransfer): MerchantResponseTransfer
     {
         $this->assertDefaultMerchantRequirements($merchantTransfer);
@@ -150,11 +145,6 @@ class MerchantUpdater implements MerchantUpdaterInterface
         return $merchantResponseTransfer;
     }
 
-    /**
-     * @param \Generated\Shared\Transfer\MerchantTransfer $merchantTransfer
-     *
-     * @return \Generated\Shared\Transfer\MerchantTransfer
-     */
     protected function executeUpdateTransaction(MerchantTransfer $merchantTransfer): MerchantTransfer
     {
         $merchantTransfer = $this->merchantUrlSaver->saveMerchantUrls($merchantTransfer);
@@ -171,11 +161,6 @@ class MerchantUpdater implements MerchantUpdaterInterface
         return $merchantTransfer;
     }
 
-    /**
-     * @param \Generated\Shared\Transfer\MerchantTransfer $merchantTransfer
-     *
-     * @return \Generated\Shared\Transfer\MerchantTransfer
-     */
     protected function updateMerchantStores(MerchantTransfer $merchantTransfer): MerchantTransfer
     {
         /** @var int $idMerchant */
@@ -258,20 +243,12 @@ class MerchantUpdater implements MerchantUpdaterInterface
         return $merchantTransfer;
     }
 
-    /**
-     * @return \Generated\Shared\Transfer\MerchantResponseTransfer
-     */
     protected function createMerchantResponseTransfer(): MerchantResponseTransfer
     {
         return (new MerchantResponseTransfer())
             ->setIsSuccess(false);
     }
 
-    /**
-     * @param \Generated\Shared\Transfer\MerchantTransfer $merchantTransfer
-     *
-     * @return void
-     */
     protected function assertDefaultMerchantRequirements(MerchantTransfer $merchantTransfer): void
     {
         $merchantTransfer
@@ -280,12 +257,6 @@ class MerchantUpdater implements MerchantUpdaterInterface
             ->requireStoreRelation();
     }
 
-    /**
-     * @param \Generated\Shared\Transfer\MerchantResponseTransfer $merchantResponseTransfer
-     * @param string $message
-     *
-     * @return \Generated\Shared\Transfer\MerchantResponseTransfer
-     */
     protected function addMerchantError(MerchantResponseTransfer $merchantResponseTransfer, string $message): MerchantResponseTransfer
     {
         $merchantResponseTransfer->addError((new MerchantErrorTransfer())->setMessage($message));
@@ -293,11 +264,6 @@ class MerchantUpdater implements MerchantUpdaterInterface
         return $merchantResponseTransfer;
     }
 
-    /**
-     * @param \Generated\Shared\Transfer\MerchantTransfer $merchantTransfer
-     *
-     * @return void
-     */
     protected function triggerPublishEvent(MerchantTransfer $merchantTransfer): void
     {
         $eventEntityTransfer = new EventEntityTransfer();

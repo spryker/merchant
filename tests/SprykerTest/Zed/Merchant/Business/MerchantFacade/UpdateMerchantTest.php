@@ -34,9 +34,6 @@ class UpdateMerchantTest extends Unit
      */
     protected $tester;
 
-    /**
-     * @return void
-     */
     public function testUpdateMerchant(): void
     {
         // Arrange
@@ -100,9 +97,6 @@ class UpdateMerchantTest extends Unit
         $this->assertFalse($merchantResponseTransfer->getIsSuccess());
     }
 
-    /**
-     * @return void
-     */
     public function testUpdateMerchantWithEmptyRequiredFieldsThrowsException(): void
     {
         // Arrange
@@ -123,9 +117,6 @@ class UpdateMerchantTest extends Unit
         $this->tester->getFacade()->updateMerchant($merchantTransfer);
     }
 
-    /**
-     * @return void
-     */
     public function testUpdateMerchantWithWrongIdReturnsIsSuccessFalse(): void
     {
         // Arrange
@@ -140,9 +131,6 @@ class UpdateMerchantTest extends Unit
         $this->assertFalse($merchantResponseTransfer->getIsSuccess());
     }
 
-    /**
-     * @return void
-     */
     public function testUpdateMerchantStores(): void
     {
         // Arrange
@@ -169,9 +157,6 @@ class UpdateMerchantTest extends Unit
         }
     }
 
-    /**
-     * @return array
-     */
     public function getCorrectStatusTransitions(): array
     {
         return [
@@ -181,9 +166,6 @@ class UpdateMerchantTest extends Unit
         ];
     }
 
-    /**
-     * @return array
-     */
     public function getWrongStatusTransitions(): array
     {
         return [
@@ -192,12 +174,6 @@ class UpdateMerchantTest extends Unit
         ];
     }
 
-    /**
-     * @param \Generated\Shared\Transfer\MerchantTransfer $merchantTransfer
-     * @param array $presetStatuses
-     *
-     * @return \Generated\Shared\Transfer\MerchantResponseTransfer
-     */
     protected function updateMerchantWithStatuses(MerchantTransfer $merchantTransfer, array $presetStatuses): MerchantResponseTransfer
     {
         $merchantResponseTransfer = (new MerchantResponseTransfer())->setIsSuccess(false);

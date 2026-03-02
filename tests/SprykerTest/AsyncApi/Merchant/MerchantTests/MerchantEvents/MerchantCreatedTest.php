@@ -30,9 +30,6 @@ class MerchantCreatedTest extends Unit
      */
     protected AsyncApiTester $tester;
 
-    /**
-     * @return void
-     */
     public function testMerchantCreatedMessageIsEmittedWhenMerchantsAreCreated(): void
     {
         // Arrange

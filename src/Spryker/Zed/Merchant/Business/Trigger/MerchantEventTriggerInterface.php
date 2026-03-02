@@ -11,17 +11,7 @@ use Generated\Shared\Transfer\MerchantTransfer;
 
 interface MerchantEventTriggerInterface
 {
-    /**
-     * @param \Generated\Shared\Transfer\MerchantTransfer $merchantTransfer
-     *
-     * @return void
-     */
     public function triggerMerchantCreatedEvent(MerchantTransfer $merchantTransfer): void;
 
-    /**
-     * @param \Generated\Shared\Transfer\MerchantTransfer $merchantTransfer
-     *
-     * @return void
-     */
     public function triggerMerchantUpdatedEvent(MerchantTransfer $merchantTransfer): void;
 }

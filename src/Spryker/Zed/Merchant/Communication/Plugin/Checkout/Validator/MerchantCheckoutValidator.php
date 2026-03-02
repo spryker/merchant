@@ -30,20 +30,11 @@ class MerchantCheckoutValidator implements MerchantCheckoutValidatorInterface
      */
     protected $merchantFacade;
 
-    /**
-     * @param \Spryker\Zed\Merchant\Business\MerchantFacadeInterface $merchantFacade
-     */
     public function __construct(MerchantFacadeInterface $merchantFacade)
     {
         $this->merchantFacade = $merchantFacade;
     }
 
-    /**
-     * @param \Generated\Shared\Transfer\QuoteTransfer $quoteTransfer
-     * @param \Generated\Shared\Transfer\CheckoutResponseTransfer $checkoutResponseTransfer
-     *
-     * @return bool
-     */
     public function checkCondition(QuoteTransfer $quoteTransfer, CheckoutResponseTransfer $checkoutResponseTransfer): bool
     {
         $validationPassed = true;

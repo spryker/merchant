@@ -35,9 +35,6 @@ class GetMerchantDataTest extends Unit
      */
     protected $tester;
 
-    /**
-     * @return void
-     */
     public function testFindOneMerchant(): void
     {
         // Arrange
@@ -58,9 +55,6 @@ class GetMerchantDataTest extends Unit
         $this->assertEquals($expectedMerchant, $actualMerchantByEmail);
     }
 
-    /**
-     * @return void
-     */
     public function testFindOneMerchantExecutesExpanderPluginsStack(): void
     {
         // Arrange
@@ -97,9 +91,6 @@ class GetMerchantDataTest extends Unit
             ->findOne($merchantCriteriaTransfer);
     }
 
-    /**
-     * @return void
-     */
     public function testFindMerchantByIdWillNotFindMerchant(): void
     {
         // Arrange
@@ -115,9 +106,6 @@ class GetMerchantDataTest extends Unit
         $this->assertNull($actualMerchant);
     }
 
-    /**
-     * @return void
-     */
     public function testFindMerchants(): void
     {
         // Arrange
@@ -165,9 +153,6 @@ class GetMerchantDataTest extends Unit
         );
     }
 
-    /**
-     * @return void
-     */
     public function testGetApplicableMerchantStatusesWillReturnArray(): void
     {
         // Act
@@ -178,9 +163,6 @@ class GetMerchantDataTest extends Unit
         $this->assertNotEmpty($applicableMerchantStatuses);
     }
 
-    /**
-     * @return void
-     */
     public function testGetApplicableMerchantStatusesWillReturnEmptyArrayOnNotFoundCurrentStatus(): void
     {
         // Act
@@ -191,9 +173,6 @@ class GetMerchantDataTest extends Unit
         $this->assertEmpty($applicableMerchantStatuses);
     }
 
-    /**
-     * @return void
-     */
     public function testReturnsMerchantsPaginatedByLimitAndOffset(): void
     {
         // Arrange

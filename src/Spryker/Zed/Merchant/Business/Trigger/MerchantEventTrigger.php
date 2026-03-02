@@ -19,19 +19,11 @@ class MerchantEventTrigger implements MerchantEventTriggerInterface
      */
     protected MerchantToEventFacadeInterface $eventFacade;
 
-    /**
-     * @param \Spryker\Zed\Merchant\Dependency\Facade\MerchantToEventFacadeInterface $eventFacade
-     */
     public function __construct(MerchantToEventFacadeInterface $eventFacade)
     {
         $this->eventFacade = $eventFacade;
     }
 
-    /**
-     * @param \Generated\Shared\Transfer\MerchantTransfer $merchantTransfer
-     *
-     * @return void
-     */
     public function triggerMerchantCreatedEvent(MerchantTransfer $merchantTransfer): void
     {
         $eventEntityTransfer = new EventEntityTransfer();
@@ -40,11 +32,6 @@ class MerchantEventTrigger implements MerchantEventTriggerInterface
         $this->eventFacade->trigger(MerchantEvents::MERCHANT_CREATED, $eventEntityTransfer);
     }
 
-    /**
-     * @param \Generated\Shared\Transfer\MerchantTransfer $merchantTransfer
-     *
-     * @return void
-     */
     public function triggerMerchantUpdatedEvent(MerchantTransfer $merchantTransfer): void
     {
         $eventEntityTransfer = new EventEntityTransfer();

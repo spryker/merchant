@@ -16,9 +16,6 @@ class MerchantStatusReader implements MerchantStatusReaderInterface
      */
     protected $merchantConfig;
 
-    /**
-     * @param \Spryker\Zed\Merchant\MerchantConfig $merchantConfig
-     */
     public function __construct(MerchantConfig $merchantConfig)
     {
         $this->merchantConfig = $merchantConfig;

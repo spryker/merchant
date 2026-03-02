@@ -66,9 +66,6 @@ class MerchantFacadeTest extends Unit
      */
     protected const AT_STORE_NAME = 'AT';
 
-    /**
-     * @return void
-     */
     protected function setUp(): void
     {
         parent::setUp();
@@ -83,9 +80,6 @@ class MerchantFacadeTest extends Unit
         ]);
     }
 
-    /**
-     * @return void
-     */
     public function testTriggerMerchantExportEventsSuccessfully(): void
     {
         // Arrange
@@ -100,9 +94,6 @@ class MerchantFacadeTest extends Unit
         $this->tester->getFacade()->triggerMerchantExportEvents($merchantExportCriteriaTransfer);
     }
 
-    /**
-     * @return void
-     */
     public function testTriggerExportMerchantsSuccessfully(): void
     {
         // Arrange
@@ -116,9 +107,6 @@ class MerchantFacadeTest extends Unit
         $this->tester->getFacade()->triggerMerchantExportEvents($merchantExportCriteriaTransfer);
     }
 
-    /**
-     * @return void
-     */
     public function testMerchantCreatedWithStoreTriggersCreatedAndPublishEvents(): void
     {
         // Arrange
@@ -131,9 +119,6 @@ class MerchantFacadeTest extends Unit
         $this->tester->getFacade()->createMerchant($merchantTransfer);
     }
 
-    /**
-     * @return void
-     */
     public function testMerchantUpdateWithStoreTriggerUpdatedAndPublishEvent(): void
     {
         // Arrange
@@ -147,9 +132,6 @@ class MerchantFacadeTest extends Unit
         $this->tester->getFacade()->updateMerchant($merchantTransfer);
     }
 
-    /**
-     * @return void
-     */
     public function testMerchantUpdateWithNewAssignedStoreTriggerUpdatedAndPublishEvent(): void
     {
         // Arrange
@@ -172,9 +154,6 @@ class MerchantFacadeTest extends Unit
         $this->tester->getFacade()->updateMerchant($merchantTransfer);
     }
 
-    /**
-     * @return void
-     */
     public function testMerchantUpdateRemovesAssignedStoreTriggerCreatedAndPublishEvent(): void
     {
         // Arrange
@@ -189,9 +168,6 @@ class MerchantFacadeTest extends Unit
         $this->tester->getFacade()->updateMerchant($merchantTransfer);
     }
 
-    /**
-     * @return void
-     */
     public function testMerchantsPublishedToMessageBrokerExpectsExceptionWhenEventIsNotAllowed(): void
     {
         // Arrange

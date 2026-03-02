@@ -12,10 +12,5 @@ use Generated\Shared\Transfer\MerchantTransfer;
 
 interface MerchantCreatorInterface
 {
-    /**
-     * @param \Generated\Shared\Transfer\MerchantTransfer $merchantTransfer
-     *
-     * @return \Generated\Shared\Transfer\MerchantResponseTransfer
-     */
     public function create(MerchantTransfer $merchantTransfer): MerchantResponseTransfer;
 }

@@ -22,33 +22,21 @@ use Spryker\Zed\Merchant\Persistence\Propel\Mapper\MerchantMapperInterface;
  */
 class MerchantPersistenceFactory extends AbstractPersistenceFactory
 {
-    /**
-     * @return \Orm\Zed\Merchant\Persistence\SpyMerchantQuery
-     */
     public function createMerchantQuery(): SpyMerchantQuery
     {
         return SpyMerchantQuery::create();
     }
 
-    /**
-     * @return \Spryker\Zed\Merchant\Persistence\Propel\Mapper\MerchantMapperInterface
-     */
     public function createPropelMerchantMapper(): MerchantMapperInterface
     {
         return new MerchantMapper();
     }
 
-    /**
-     * @return \Orm\Zed\Merchant\Persistence\SpyMerchantStoreQuery
-     */
     public function createMerchantStoreQuery(): SpyMerchantStoreQuery
     {
         return SpyMerchantStoreQuery::create();
     }
 
-    /**
-     * @return \Orm\Zed\Url\Persistence\SpyUrlQuery
-     */
     public function getUrlPropelQuery(): SpyUrlQuery
     {
         return $this->getProvidedDependency(MerchantDependencyProvider::PROPEL_QUERY_URL);

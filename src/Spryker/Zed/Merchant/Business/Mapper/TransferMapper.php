@@ -12,12 +12,6 @@ use Spryker\Shared\Kernel\Transfer\AbstractTransfer;
 
 class TransferMapper implements TransferMapperInterface
 {
-    /**
-     * @param \Spryker\Shared\Kernel\Transfer\AbstractTransfer $transfer
-     * @param array $allowedFields
-     *
-     * @return array
-     */
     public function mapTransferDataByAllowedFields(AbstractTransfer $transfer, array $allowedFields): array
     {
         return $this->mapTransferDataByAllowedFieldsRecursive(
@@ -27,13 +21,6 @@ class TransferMapper implements TransferMapperInterface
         );
     }
 
-    /**
-     * @param \Spryker\Shared\Kernel\Transfer\AbstractTransfer $transfer
-     * @param array $allowedFields
-     * @param array $mappedData
-     *
-     * @return array
-     */
     protected function mapTransferDataByAllowedFieldsRecursive(
         AbstractTransfer $transfer,
         array $allowedFields,

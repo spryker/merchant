@@ -33,9 +33,6 @@ class CreateMerchantTest extends Unit
      */
     protected $tester;
 
-    /**
-     * @return void
-     */
     public function testCreateMerchantStatus(): void
     {
         // Arrange
@@ -50,9 +47,6 @@ class CreateMerchantTest extends Unit
         $this->assertNotNull($merchantResponseTransfer->getMerchant()->getMerchantReference());
     }
 
-    /**
-     * @return void
-     */
     public function testCreateMerchantWithStore(): void
     {
         // Arrange
@@ -70,9 +64,6 @@ class CreateMerchantTest extends Unit
         $this->assertCount(1, $merchantTransfer->getStoreRelation()->getIdStores());
     }
 
-    /**
-     * @return void
-     */
     public function testCreateMerchantWithEmptyRequiredFieldsThrowsException(): void
     {
         // Arrange

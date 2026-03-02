@@ -35,11 +35,6 @@ class MerchantExpander implements MerchantExpanderInterface
         $this->merchantBulkExpanderPlugins = $merchantBulkExpanderPlugins;
     }
 
-    /**
-     * @param \Generated\Shared\Transfer\MerchantCollectionTransfer $merchantCollectionTransfer
-     *
-     * @return \Generated\Shared\Transfer\MerchantCollectionTransfer
-     */
     public function expand(MerchantCollectionTransfer $merchantCollectionTransfer): MerchantCollectionTransfer
     {
         $merchantCollectionTransfer = $this->executeMerchantSingleExpanderPlugins($merchantCollectionTransfer);
@@ -70,11 +65,6 @@ class MerchantExpander implements MerchantExpanderInterface
         return $resultMerchantCollectionTransfer;
     }
 
-    /**
-     * @param \Generated\Shared\Transfer\MerchantCollectionTransfer $merchantCollectionTransfer
-     *
-     * @return \Generated\Shared\Transfer\MerchantCollectionTransfer
-     */
     protected function executeMerchantBulkExpanderPlugins(MerchantCollectionTransfer $merchantCollectionTransfer): MerchantCollectionTransfer
     {
         foreach ($this->merchantBulkExpanderPlugins as $merchantBulkExpanderPlugin) {

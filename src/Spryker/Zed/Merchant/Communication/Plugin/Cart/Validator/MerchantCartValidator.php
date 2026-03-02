@@ -53,19 +53,11 @@ class MerchantCartValidator implements MerchantCartValidatorInterface
      */
     protected static $merchantTransfersCache;
 
-    /**
-     * @param \Spryker\Zed\Merchant\Business\MerchantFacadeInterface $merchantFacade
-     */
     public function __construct(MerchantFacadeInterface $merchantFacade)
     {
         $this->merchantFacade = $merchantFacade;
     }
 
-    /**
-     * @param \Generated\Shared\Transfer\CartChangeTransfer $cartChangeTransfer
-     *
-     * @return \Generated\Shared\Transfer\CartPreCheckResponseTransfer
-     */
     public function check(CartChangeTransfer $cartChangeTransfer): CartPreCheckResponseTransfer
     {
         $messageTransfers = [];

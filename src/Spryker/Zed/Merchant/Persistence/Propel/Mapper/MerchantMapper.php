@@ -19,12 +19,6 @@ use Orm\Zed\Url\Persistence\SpyUrl;
 
 class MerchantMapper implements MerchantMapperInterface
 {
-    /**
-     * @param \Generated\Shared\Transfer\MerchantTransfer $merchantTransfer
-     * @param \Orm\Zed\Merchant\Persistence\SpyMerchant $merchantEntity
-     *
-     * @return \Orm\Zed\Merchant\Persistence\SpyMerchant
-     */
     public function mapMerchantTransferToMerchantEntity(
         MerchantTransfer $merchantTransfer,
         SpyMerchant $merchantEntity
@@ -36,12 +30,6 @@ class MerchantMapper implements MerchantMapperInterface
         return $merchantEntity;
     }
 
-    /**
-     * @param \Orm\Zed\Merchant\Persistence\SpyMerchant $merchantEntity
-     * @param \Generated\Shared\Transfer\MerchantTransfer $merchantTransfer
-     *
-     * @return \Generated\Shared\Transfer\MerchantTransfer
-     */
     public function mapMerchantEntityToMerchantTransfer(
         SpyMerchant $merchantEntity,
         MerchantTransfer $merchantTransfer
@@ -73,12 +61,6 @@ class MerchantMapper implements MerchantMapperInterface
         return $merchantCollectionTransfer;
     }
 
-    /**
-     * @param \Orm\Zed\Store\Persistence\SpyStore $storeEntity
-     * @param \Generated\Shared\Transfer\StoreTransfer $storeTransfer
-     *
-     * @return \Generated\Shared\Transfer\StoreTransfer
-     */
     public function mapStoreEntityToStoreTransfer(
         SpyStore $storeEntity,
         StoreTransfer $storeTransfer
@@ -86,12 +68,6 @@ class MerchantMapper implements MerchantMapperInterface
         return $storeTransfer->fromArray($storeEntity->toArray(), true);
     }
 
-    /**
-     * @param \Orm\Zed\Url\Persistence\SpyUrl $urlEntity
-     * @param \Generated\Shared\Transfer\UrlTransfer $urlTransfer
-     *
-     * @return \Generated\Shared\Transfer\UrlTransfer
-     */
     public function mapUrlEntityToUrlTransfer(SpyUrl $urlEntity, UrlTransfer $urlTransfer): UrlTransfer
     {
         return $urlTransfer->fromArray($urlEntity->toArray(), true)

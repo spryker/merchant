@@ -11,11 +11,6 @@ use Generated\Shared\Transfer\MerchantTransfer;
 
 interface MerchantUrlSaverInterface
 {
-    /**
-     * @param \Generated\Shared\Transfer\MerchantTransfer $merchantTransfer
-     *
-     * @return \Generated\Shared\Transfer\MerchantTransfer
-     */
     public function saveMerchantUrls(
         MerchantTransfer $merchantTransfer
     ): MerchantTransfer;

@@ -14,10 +14,5 @@ use Generated\Shared\Transfer\MerchantExportCriteriaTransfer;
  */
 interface MerchantExporterInterface
 {
-    /**
-     * @param \Generated\Shared\Transfer\MerchantExportCriteriaTransfer $merchantExportCriteriaTransfer
-     *
-     * @return void
-     */
     public function export(MerchantExportCriteriaTransfer $merchantExportCriteriaTransfer): void;
 }

@@ -11,11 +11,5 @@ use Spryker\Shared\Kernel\Transfer\AbstractTransfer;
 
 interface TransferMapperInterface
 {
-    /**
-     * @param \Spryker\Shared\Kernel\Transfer\AbstractTransfer $transfer
-     * @param array $allowedFields
-     *
-     * @return array
-     */
     public function mapTransferDataByAllowedFields(AbstractTransfer $transfer, array $allowedFields): array;
 }

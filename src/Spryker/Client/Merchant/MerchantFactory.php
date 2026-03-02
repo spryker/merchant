@@ -13,9 +13,6 @@ use Spryker\Client\Merchant\Mapper\MerchantShoppingListItemToItemMapperInterface
 
 class MerchantFactory extends AbstractFactory
 {
-    /**
-     * @return \Spryker\Client\Merchant\Mapper\MerchantShoppingListItemToItemMapperInterface
-     */
     public function createMerchantShoppingListItemToItemMapper(): MerchantShoppingListItemToItemMapperInterface
     {
         return new MerchantShoppingListItemToItemMapper();

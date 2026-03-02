@@ -19,9 +19,6 @@ class PriceProductMerchantRelationshipStorageFilter implements PriceProductMerch
      */
     protected MerchantRepositoryInterface $merchantRepository;
 
-    /**
-     * @param \Spryker\Zed\Merchant\Persistence\MerchantRepositoryInterface $merchantRepository
-     */
     public function __construct(MerchantRepositoryInterface $merchantRepository)
     {
         $this->merchantRepository = $merchantRepository;

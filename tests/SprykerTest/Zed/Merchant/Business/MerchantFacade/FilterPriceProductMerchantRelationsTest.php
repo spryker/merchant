@@ -28,9 +28,6 @@ class FilterPriceProductMerchantRelationsTest extends Unit
      */
     protected $tester;
 
-    /**
-     * @return void
-     */
     public function testFilterPriceProductMerchantRelationsWithActivatedMerchantReturnsArrayWithMerchantPrices(): void
     {
         // Arrange
@@ -48,9 +45,6 @@ class FilterPriceProductMerchantRelationsTest extends Unit
         $this->assertSame(2, count($filteredPriceProductMerchantRelationshipStorageTransfers));
     }
 
-    /**
-     * @return void
-     */
     public function testFilterPriceProductMerchantRelationsWithDeactivatedMerchantReturnsArrayWithoutNonActiveMerchantPrices(): void
     {
         // Arrange

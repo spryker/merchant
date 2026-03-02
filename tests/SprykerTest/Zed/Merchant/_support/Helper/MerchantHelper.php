@@ -34,11 +34,6 @@ class MerchantHelper extends Module
      */
     public const STATUS_APPROVED = 'approved';
 
-    /**
-     * @param array $seedData
-     *
-     * @return \Generated\Shared\Transfer\MerchantTransfer
-     */
     public function haveMerchant(array $seedData = []): MerchantTransfer
     {
         $merchantTransfer = $this->getMerchantTransfer($seedData);
@@ -72,11 +67,6 @@ class MerchantHelper extends Module
         return $merchantTransfer;
     }
 
-    /**
-     * @param array $seedData
-     *
-     * @return \Generated\Shared\Transfer\MerchantTransfer
-     */
     public function haveActiveMerchantWithStore(array $seedData = []): MerchantTransfer
     {
         $seedData = array_merge([
@@ -89,9 +79,6 @@ class MerchantHelper extends Module
         return $this->haveMerchant($seedData);
     }
 
-    /**
-     * @return \Generated\Shared\Transfer\MerchantTransfer
-     */
     public function haveMerchantWithStore(array $seedData = []): MerchantTransfer
     {
         $storeRelationTransfer = $this->getStoreRelationTransfer($seedData);
@@ -117,31 +104,17 @@ class MerchantHelper extends Module
             ])->build();
     }
 
-    /**
-     * @param int $idMerchant
-     *
-     * @return void
-     */
     public function assertMerchantNotExists(int $idMerchant): void
     {
         $query = $this->getMerchantQuery()->filterByIdMerchant($idMerchant);
         $this->assertSame(0, $query->count());
     }
 
-    /**
-     * @return \Spryker\Zed\Merchant\MerchantConfig
-     */
     public function createMerchantConfig(): MerchantConfig
     {
         return new MerchantConfig();
     }
 
-    /**
-     * @param \Generated\Shared\Transfer\MerchantTransfer $merchantTransfer
-     * @param array $seedData
-     *
-     * @return \Generated\Shared\Transfer\MerchantTransfer
-     */
     protected function addStoreRelation(MerchantTransfer $merchantTransfer, array $seedData): MerchantTransfer
     {
         $storeRelationTransfer = $this->createStoreRelationTransfer($seedData);
@@ -150,11 +123,6 @@ class MerchantHelper extends Module
         return $merchantTransfer;
     }
 
-    /**
-     * @param array $seedData
-     *
-     * @return \Generated\Shared\Transfer\StoreRelationTransfer
-     */
     protected function createStoreRelationTransfer(array $seedData): StoreRelationTransfer
     {
         if (isset($seedData[MerchantTransfer::STORE_RELATION])) {
@@ -164,19 +132,11 @@ class MerchantHelper extends Module
         return (new StoreRelationBuilder())->seed($seedData)->build();
     }
 
-    /**
-     * @return \Orm\Zed\Merchant\Persistence\SpyMerchantQuery
-     */
     protected function getMerchantQuery(): SpyMerchantQuery
     {
         return SpyMerchantQuery::create();
     }
 
-    /**
-     * @param array $seedData
-     *
-     * @return \Generated\Shared\Transfer\MerchantTransfer
-     */
     public function getMerchantTransfer(array $seedData = []): MerchantTransfer
     {
         /** @var \Generated\Shared\Transfer\MerchantTransfer $merchantTransfer */
@@ -187,11 +147,6 @@ class MerchantHelper extends Module
         return $merchantTransfer;
     }
 
-    /**
-     * @param array $seed
-     *
-     * @return \Generated\Shared\Transfer\MerchantProfileTransfer
-     */
     protected function buildMerchantProfileTransfer(array $seed = []): MerchantProfileTransfer
     {
         return (new MerchantProfileBuilder($seed))->build();

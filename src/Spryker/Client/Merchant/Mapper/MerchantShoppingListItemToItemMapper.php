@@ -12,12 +12,6 @@ use Generated\Shared\Transfer\ShoppingListItemTransfer;
 
 class MerchantShoppingListItemToItemMapper implements MerchantShoppingListItemToItemMapperInterface
 {
-    /**
-     * @param \Generated\Shared\Transfer\ShoppingListItemTransfer $shoppingListItemTransfer
-     * @param \Generated\Shared\Transfer\ItemTransfer $itemTransfer
-     *
-     * @return \Generated\Shared\Transfer\ItemTransfer
-     */
     public function map(ShoppingListItemTransfer $shoppingListItemTransfer, ItemTransfer $itemTransfer): ItemTransfer
     {
         if ($shoppingListItemTransfer->getMerchantReference()) {

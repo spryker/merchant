@@ -14,21 +14,12 @@ class MerchantStatusValidator implements MerchantStatusValidatorInterface
      */
     protected $merchantStatusReader;
 
-    /**
-     * @param \Spryker\Zed\Merchant\Business\Status\MerchantStatusReaderInterface $merchantStatusReader
-     */
     public function __construct(
         MerchantStatusReaderInterface $merchantStatusReader
     ) {
         $this->merchantStatusReader = $merchantStatusReader;
     }
 
-    /**
-     * @param string $currentStatus
-     * @param string $newStatus
-     *
-     * @return bool
-     */
     public function isMerchantStatusTransitionValid(string $currentStatus, string $newStatus): bool
     {
         if ($currentStatus === $newStatus) {
@@ -42,12 +33,6 @@ class MerchantStatusValidator implements MerchantStatusValidatorInterface
         return true;
     }
 
-    /**
-     * @param string $currentStatus
-     * @param string $newStatus
-     *
-     * @return bool
-     */
     protected function isTransitionToStatusAllowed(string $currentStatus, string $newStatus): bool
     {
         $applicableMerchantStatuses = $this->merchantStatusReader->getApplicableMerchantStatuses($currentStatus);

@@ -30,9 +30,6 @@ class MerchantExportedTest extends Unit
      */
     protected AsyncApiTester $tester;
 
-    /**
-     * @return void
-     */
     public function testMerchantExportedMessageIsEmittedWhenMerchantsAreExported(): void
     {
         // Arrange
