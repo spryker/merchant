@@ -18,6 +18,8 @@ use Spryker\Zed\Kernel\AbstractBundleConfig;
 
 class MerchantConfig extends AbstractBundleConfig
 {
+    protected const string CHECKOUT_ERROR_TYPE = 'MerchantUnavailable';
+
     /**
      * @var string
      */
@@ -32,6 +34,17 @@ class MerchantConfig extends AbstractBundleConfig
      * @var string
      */
     public const STATUS_DENIED = 'denied';
+
+    /**
+     * Specification:
+     * - Returns the error type identifier used in CheckoutErrorTransfer for errors produced by this module.
+     *
+     * @api
+     */
+    public function getCheckoutErrorType(): string
+    {
+        return static::CHECKOUT_ERROR_TYPE;
+    }
 
     /**
      * @api

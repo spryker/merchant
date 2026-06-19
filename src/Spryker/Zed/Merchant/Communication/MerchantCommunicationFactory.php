@@ -28,6 +28,6 @@ class MerchantCommunicationFactory extends AbstractCommunicationFactory
 
     public function createMerchantCheckoutValidator(): MerchantCheckoutValidatorInterface
     {
-        return new MerchantCheckoutValidator($this->getFacade());
+        return new MerchantCheckoutValidator($this->getFacade(), $this->getConfig());
     }
 }

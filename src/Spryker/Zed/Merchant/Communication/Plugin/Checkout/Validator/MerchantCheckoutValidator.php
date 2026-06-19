@@ -12,6 +12,7 @@ use Generated\Shared\Transfer\CheckoutResponseTransfer;
 use Generated\Shared\Transfer\MerchantCriteriaTransfer;
 use Generated\Shared\Transfer\QuoteTransfer;
 use Spryker\Zed\Merchant\Business\MerchantFacadeInterface;
+use Spryker\Zed\Merchant\MerchantConfig;
 
 class MerchantCheckoutValidator implements MerchantCheckoutValidatorInterface
 {
@@ -25,14 +26,10 @@ class MerchantCheckoutValidator implements MerchantCheckoutValidatorInterface
      */
     protected const GLOSSARY_PARAM_SKU = '%sku%';
 
-    /**
-     * @var \Spryker\Zed\Merchant\Business\MerchantFacadeInterface
-     */
-    protected $merchantFacade;
-
-    public function __construct(MerchantFacadeInterface $merchantFacade)
-    {
-        $this->merchantFacade = $merchantFacade;
+    public function __construct(
+        protected MerchantFacadeInterface $merchantFacade,
+        protected MerchantConfig $merchantConfig
+    ) {
     }
 
     public function checkCondition(QuoteTransfer $quoteTransfer, CheckoutResponseTransfer $checkoutResponseTransfer): bool
@@ -48,7 +45,9 @@ class MerchantCheckoutValidator implements MerchantCheckoutValidatorInterface
             if (!isset($merchantTransfers[$itemTransfer->getMerchantReference()])) {
                 $checkoutErrorTransfer = (new CheckoutErrorTransfer())
                     ->setMessage(static::GLOSSARY_KEY_REMOVED_MERCHANT)
-                    ->setParameters([static::GLOSSARY_PARAM_SKU => $itemTransfer->getSku()]);
+                    ->setParameters([static::GLOSSARY_PARAM_SKU => $itemTransfer->getSku()])
+                    ->setErrorType($this->merchantConfig->getCheckoutErrorType())
+                    ->setGroupKey($itemTransfer->getGroupKey());
 
                 $checkoutResponseTransfer->addError($checkoutErrorTransfer);
                 $validationPassed = false;
