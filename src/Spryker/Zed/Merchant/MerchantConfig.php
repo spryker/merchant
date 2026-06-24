@@ -21,16 +21,22 @@ class MerchantConfig extends AbstractBundleConfig
     protected const string CHECKOUT_ERROR_TYPE = 'MerchantUnavailable';
 
     /**
+     * @api
+     *
      * @var string
      */
     public const STATUS_WAITING_FOR_APPROVAL = 'waiting-for-approval';
 
     /**
+     * @api
+     *
      * @var string
      */
     public const STATUS_APPROVED = 'approved';
 
     /**
+     * @api
+     *
      * @var string
      */
     public const STATUS_DENIED = 'denied';
