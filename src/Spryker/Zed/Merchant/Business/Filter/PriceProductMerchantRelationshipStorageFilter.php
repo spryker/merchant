@@ -37,11 +37,13 @@ class PriceProductMerchantRelationshipStorageFilter implements PriceProductMerch
             return [];
         }
 
+        $activeMerchantIdMap = array_fill_keys($activeMerchantIds, true);
+
         /** @var array<\Generated\Shared\Transfer\PriceProductMerchantRelationshipStorageTransfer> $priceProductMerchantRelationshipStorageTransfers */
-        $priceProductMerchantRelationshipStorageTransfers = array_map(function (PriceProductMerchantRelationshipStorageTransfer $priceProductMerchantRelationshipStorageTransfer) use ($activeMerchantIds) {
+        $priceProductMerchantRelationshipStorageTransfers = array_map(function (PriceProductMerchantRelationshipStorageTransfer $priceProductMerchantRelationshipStorageTransfer) use ($activeMerchantIdMap) {
             return $this->getPriceProductMerchantRelationshipStorageTransferWithFilteredUngroupedPricesByMerchantActive(
                 $priceProductMerchantRelationshipStorageTransfer,
-                $activeMerchantIds,
+                $activeMerchantIdMap,
             );
         }, $priceProductMerchantRelationshipStorageTransfers);
 
@@ -52,17 +54,17 @@ class PriceProductMerchantRelationshipStorageFilter implements PriceProductMerch
 
     /**
      * @param \Generated\Shared\Transfer\PriceProductMerchantRelationshipStorageTransfer $priceProductMerchantRelationshipStorageTransfer
-     * @param array<int> $activeMerchantIds
+     * @param array<int, bool> $activeMerchantIdMap
      *
      * @return \Generated\Shared\Transfer\PriceProductMerchantRelationshipStorageTransfer|null
      */
     protected function getPriceProductMerchantRelationshipStorageTransferWithFilteredUngroupedPricesByMerchantActive(
         PriceProductMerchantRelationshipStorageTransfer $priceProductMerchantRelationshipStorageTransfer,
-        array $activeMerchantIds
+        array $activeMerchantIdMap
     ): ?PriceProductMerchantRelationshipStorageTransfer {
         $filteredPriceProductMerchantRelationshipValueTransfers = new ArrayObject();
         foreach ($priceProductMerchantRelationshipStorageTransfer->getUngroupedPrices() as $priceProductMerchantRelationshipValueTransfer) {
-            if (!in_array($priceProductMerchantRelationshipValueTransfer->getFkMerchantOrFail(), $activeMerchantIds)) {
+            if (!isset($activeMerchantIdMap[$priceProductMerchantRelationshipValueTransfer->getFkMerchantOrFail()])) {
                 continue;
             }
             $filteredPriceProductMerchantRelationshipValueTransfers->append($priceProductMerchantRelationshipValueTransfer);
