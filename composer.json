@@ -11,8 +11,9 @@
         "spryker/event": "^2.3.0",
         "spryker/event-behavior": "^1.32.0",
         "spryker/kernel": "^3.33.0",
+        "spryker/locale": "^4.0.0",
         "spryker/log": "^3.0.0",
-        "spryker/merchant-extension": "^1.2.0",
+        "spryker/merchant-extension": "^1.4.0",
         "spryker/message-broker": "^1.5.0",
         "spryker/message-broker-extension": "^1.0.0",
         "spryker/price-product-merchant-relationship-storage-extension": "^1.0.0",
@@ -20,11 +21,13 @@
         "spryker/publisher-extension": "^1.0.0",
         "spryker/shopping-list-extension": "^1.2.0",
         "spryker/store": "^1.20.0",
+        "spryker/symfony": "^3.0.0",
         "spryker/transfer": "^3.27.0",
         "spryker/url": "^3.0.0",
         "spryker/util-text": "^1.0.0"
     },
     "require-dev": {
+        "spryker/api-platform": "*",
         "spryker/code-sniffer": "*",
         "spryker/container": "*",
         "spryker/customer": "*",
@@ -33,6 +36,10 @@
         "spryker/sales": "*",
         "spryker/tax-app": "*",
         "spryker/testify": "*"
+    },
+    "suggest": {
+        "spryker/api-platform": "Required to expose the merchants Backend API resource; without it the resource schema is never discovered.",
+        "spryker/merchant-profile": "Required when the merchant post-create plugin stack expects a merchant profile; the Backend API then sends an empty one on create."
     },
     "autoload": {
         "psr-4": {

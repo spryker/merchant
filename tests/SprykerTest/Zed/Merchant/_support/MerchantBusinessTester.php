@@ -9,7 +9,6 @@ namespace SprykerTest\Zed\Merchant;
 
 use ArrayObject;
 use Codeception\Actor;
-use Generated\Shared\DataBuilder\MerchantBuilder;
 use Generated\Shared\DataBuilder\StoreRelationBuilder;
 use Generated\Shared\Transfer\EventEntityTransfer;
 use Generated\Shared\Transfer\MerchantCriteriaTransfer;
@@ -52,8 +51,7 @@ class MerchantBusinessTester extends Actor
 
     public function createMerchantTransfer(?int $merchantId = null): MerchantTransfer
     {
-        return (new MerchantBuilder())
-            ->build()
+        return $this->getMerchantTransfer()
             ->setIdMerchant($merchantId)
             ->setStoreRelation((new StoreRelationBuilder())->build());
     }

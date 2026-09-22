@@ -16,6 +16,7 @@ use Spryker\Zed\Kernel\Persistence\EntityManager\TransactionTrait;
 use Spryker\Zed\Merchant\Business\Exception\MerchantNotSavedException;
 use Spryker\Zed\Merchant\Business\MerchantUrlSaver\MerchantUrlSaverInterface;
 use Spryker\Zed\Merchant\Business\Trigger\MerchantEventTriggerInterface;
+use Spryker\Zed\Merchant\Business\Validator\MerchantValidatorInterface;
 use Spryker\Zed\Merchant\Dependency\Facade\MerchantToEventFacadeInterface;
 use Spryker\Zed\Merchant\Dependency\MerchantEvents;
 use Spryker\Zed\Merchant\MerchantConfig;
@@ -62,6 +63,7 @@ class MerchantCreator implements MerchantCreatorInterface
      * @param \Spryker\Zed\Merchant\Business\MerchantUrlSaver\MerchantUrlSaverInterface $merchantUrlSaver
      * @param \Spryker\Zed\Merchant\Dependency\Facade\MerchantToEventFacadeInterface $eventFacade
      * @param \Spryker\Zed\Merchant\Business\Trigger\MerchantEventTriggerInterface $merchantEventTrigger
+     * @param \Spryker\Zed\Merchant\Business\Validator\MerchantValidatorInterface $merchantValidator
      */
     public function __construct(
         MerchantEntityManagerInterface $merchantEntityManager,
@@ -69,7 +71,8 @@ class MerchantCreator implements MerchantCreatorInterface
         array $merchantPostCreatePlugins,
         MerchantUrlSaverInterface $merchantUrlSaver,
         MerchantToEventFacadeInterface $eventFacade,
-        MerchantEventTriggerInterface $merchantEventTrigger
+        MerchantEventTriggerInterface $merchantEventTrigger,
+        protected MerchantValidatorInterface $merchantValidator
     ) {
         $this->merchantEntityManager = $merchantEntityManager;
         $this->merchantConfig = $merchantConfig;
@@ -85,6 +88,12 @@ class MerchantCreator implements MerchantCreatorInterface
 
         if (!$merchantTransfer->getStatus()) {
             $merchantTransfer->setStatus($this->merchantConfig->getDefaultMerchantStatus());
+        }
+
+        $validationMerchantResponseTransfer = $this->merchantValidator->validate($merchantTransfer);
+
+        if (!$validationMerchantResponseTransfer->getIsSuccess()) {
+            return $validationMerchantResponseTransfer;
         }
 
         $merchantResponseTransfer = $this->createMerchantResponseTransfer();

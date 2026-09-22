@@ -7,6 +7,7 @@
 
 namespace Spryker\Zed\Merchant\Business;
 
+use Generated\Shared\Transfer\LocaleTransfer;
 use Generated\Shared\Transfer\MerchantCollectionTransfer;
 use Generated\Shared\Transfer\MerchantCriteriaTransfer;
 use Generated\Shared\Transfer\MerchantExportCriteriaTransfer;
@@ -148,5 +149,35 @@ class MerchantFacade extends AbstractFacade implements MerchantFacadeInterface
     public function emitPublishMerchantToMessageBroker(MerchantPublisherConfigTransfer $merchantPublisherConfigTransfer): void
     {
         $this->getFactory()->createMerchantMessageBrokerPublisher()->publish($merchantPublisherConfigTransfer);
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @api
+     *
+     * @param \Generated\Shared\Transfer\LocaleTransfer $localeTransfer
+     *
+     * @return string
+     */
+    public function buildMerchantUrlPrefixForLocale(LocaleTransfer $localeTransfer): string
+    {
+        return $this->getFactory()
+            ->createMerchantUrlPrefixBuilder()
+            ->buildLocalizedUrlPrefix($localeTransfer);
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @api
+     *
+     * @return array<string>
+     */
+    public function getMerchantStatuses(): array
+    {
+        return $this->getFactory()
+            ->createMerchantStatusReader()
+            ->getSupportedStatuses();
     }
 }

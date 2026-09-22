@@ -8,6 +8,7 @@
 namespace Spryker\Zed\Merchant\Business;
 
 use Spryker\Zed\Kernel\Business\AbstractBusinessFactory;
+use Spryker\Zed\Locale\Business\LocaleFacadeInterface;
 use Spryker\Zed\Merchant\Business\Creator\MerchantCreator;
 use Spryker\Zed\Merchant\Business\Creator\MerchantCreatorInterface;
 use Spryker\Zed\Merchant\Business\Expander\MerchantExpander;
@@ -32,6 +33,14 @@ use Spryker\Zed\Merchant\Business\Trigger\MerchantEventTrigger;
 use Spryker\Zed\Merchant\Business\Trigger\MerchantEventTriggerInterface;
 use Spryker\Zed\Merchant\Business\Updater\MerchantUpdater;
 use Spryker\Zed\Merchant\Business\Updater\MerchantUpdaterInterface;
+use Spryker\Zed\Merchant\Business\Url\MerchantUrlPrefixBuilder;
+use Spryker\Zed\Merchant\Business\Url\MerchantUrlPrefixBuilderInterface;
+use Spryker\Zed\Merchant\Business\Validator\MerchantValidator;
+use Spryker\Zed\Merchant\Business\Validator\MerchantValidatorInterface;
+use Spryker\Zed\Merchant\Business\Validator\UniqueEmailMerchantValidator;
+use Spryker\Zed\Merchant\Business\Validator\UniqueMerchantReferenceMerchantValidator;
+use Spryker\Zed\Merchant\Business\Validator\UniqueNameMerchantValidator;
+use Spryker\Zed\Merchant\Business\Validator\UrlMerchantValidator;
 use Spryker\Zed\Merchant\Dependency\Facade\MerchantToEventFacadeInterface;
 use Spryker\Zed\Merchant\Dependency\Facade\MerchantToMessageBrokerFacadeInterface;
 use Spryker\Zed\Merchant\Dependency\Facade\MerchantToStoreFacadeInterface;
@@ -55,6 +64,7 @@ class MerchantBusinessFactory extends AbstractBusinessFactory
             $this->createMerchantUrlSaver(),
             $this->getEventFacade(),
             $this->createMerchantEventTrigger(),
+            $this->createMerchantValidator(),
         );
     }
 
@@ -68,6 +78,7 @@ class MerchantBusinessFactory extends AbstractBusinessFactory
             $this->createMerchantUrlSaver(),
             $this->getEventFacade(),
             $this->createMerchantEventTrigger(),
+            $this->createMerchantValidator(),
         );
     }
 
@@ -85,6 +96,36 @@ class MerchantBusinessFactory extends AbstractBusinessFactory
         return new MerchantStatusReader(
             $this->getConfig(),
         );
+    }
+
+    public function createMerchantValidator(): MerchantValidatorInterface
+    {
+        return new MerchantValidator($this->getMerchantValidatorPlugins());
+    }
+
+    public function createUniqueEmailMerchantValidator(): MerchantValidatorInterface
+    {
+        return new UniqueEmailMerchantValidator($this->getRepository());
+    }
+
+    public function createUniqueMerchantReferenceMerchantValidator(): MerchantValidatorInterface
+    {
+        return new UniqueMerchantReferenceMerchantValidator($this->getRepository());
+    }
+
+    public function createUniqueNameMerchantValidator(): MerchantValidatorInterface
+    {
+        return new UniqueNameMerchantValidator($this->getRepository());
+    }
+
+    public function createUrlMerchantValidator(): MerchantValidatorInterface
+    {
+        return new UrlMerchantValidator($this->getUrlFacade(), $this->getConfig());
+    }
+
+    public function createMerchantUrlPrefixBuilder(): MerchantUrlPrefixBuilderInterface
+    {
+        return new MerchantUrlPrefixBuilder($this->getConfig());
     }
 
     public function createMerchantStatusValidator(): MerchantStatusValidatorInterface
@@ -113,6 +154,14 @@ class MerchantBusinessFactory extends AbstractBusinessFactory
     public function getMerchantPostUpdatePlugins(): array
     {
         return $this->getProvidedDependency(MerchantDependencyProvider::PLUGINS_MERCHANT_POST_UPDATE);
+    }
+
+    /**
+     * @return array<\Spryker\Zed\MerchantExtension\Dependency\Plugin\MerchantValidatorPluginInterface>
+     */
+    public function getMerchantValidatorPlugins(): array
+    {
+        return $this->getProvidedDependency(MerchantDependencyProvider::PLUGINS_MERCHANT_VALIDATOR);
     }
 
     /**
@@ -220,5 +269,10 @@ class MerchantBusinessFactory extends AbstractBusinessFactory
     public function getStoreFacade(): MerchantToStoreFacadeInterface
     {
         return $this->getProvidedDependency(MerchantDependencyProvider::FACADE_STORE);
+    }
+
+    public function getLocaleFacade(): LocaleFacadeInterface
+    {
+        return $this->getProvidedDependency(MerchantDependencyProvider::FACADE_LOCALE);
     }
 }

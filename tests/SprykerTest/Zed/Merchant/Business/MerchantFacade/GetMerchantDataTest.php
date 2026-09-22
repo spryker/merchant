@@ -11,8 +11,12 @@ use Codeception\Test\Unit;
 use Generated\Shared\Transfer\FilterTransfer;
 use Generated\Shared\Transfer\MerchantCollectionTransfer;
 use Generated\Shared\Transfer\MerchantCriteriaTransfer;
+use Generated\Shared\Transfer\MerchantTransfer;
 use Generated\Shared\Transfer\PaginationTransfer;
+use Generated\Shared\Transfer\StoreRelationTransfer;
+use Generated\Shared\Transfer\StoreTransfer;
 use Orm\Zed\Merchant\Persistence\Map\SpyMerchantTableMap;
+use Spryker\Zed\Merchant\MerchantConfig;
 use Spryker\Zed\Merchant\MerchantDependencyProvider;
 use Spryker\Zed\MerchantExtension\Dependency\Plugin\MerchantBulkExpanderPluginInterface;
 use Spryker\Zed\MerchantExtension\Dependency\Plugin\MerchantExpanderPluginInterface;
@@ -30,6 +34,16 @@ use Spryker\Zed\MerchantExtension\Dependency\Plugin\MerchantExpanderPluginInterf
  */
 class GetMerchantDataTest extends Unit
 {
+    protected const string STORE_NAME_FIRST = 'DE';
+
+    protected const string STORE_NAME_SECOND = 'AT';
+
+    protected const string SEARCHABLE_MERCHANT_NAME = 'Spryker Searchable Merchant';
+
+    protected const string NON_MATCHING_MERCHANT_NAME = 'Unrelated Merchant';
+
+    protected const string SEARCH_TERM_IN_DIFFERENT_CASE = 'sEaRcHaBlE';
+
     /**
      * @var \SprykerTest\Zed\Merchant\MerchantBusinessTester
      */
@@ -171,6 +185,93 @@ class GetMerchantDataTest extends Unit
         // Assert
         $this->assertTrue(is_array($applicableMerchantStatuses));
         $this->assertEmpty($applicableMerchantStatuses);
+    }
+
+    public function testGetReturnsThePaginationOfTheExpandedCollection(): void
+    {
+        // Arrange
+        $this->tester->truncateMerchantRelations();
+        $this->tester->haveMerchant();
+        $this->tester->haveMerchant();
+
+        $merchantCriteriaTransfer = (new MerchantCriteriaTransfer())
+            ->setPagination((new PaginationTransfer())->setPage(1)->setMaxPerPage(1));
+
+        // Act
+        $merchantCollectionTransfer = $this->tester->getFacade()->get($merchantCriteriaTransfer);
+
+        // Assert
+        $this->assertCount(1, $merchantCollectionTransfer->getMerchants());
+        $this->assertSame(2, $merchantCollectionTransfer->getPaginationOrFail()->getNbResults());
+        $this->assertSame(2, $merchantCollectionTransfer->getPaginationOrFail()->getLastPage());
+    }
+
+    public function testGetReturnsOnlyMerchantsWhoseStatusIsInTheRequestedStatuses(): void
+    {
+        // Arrange
+        $this->tester->truncateMerchantRelations();
+        $approvedMerchantTransfer = $this->tester->haveMerchant([MerchantTransfer::STATUS => MerchantConfig::STATUS_APPROVED]);
+        $this->tester->haveMerchant([MerchantTransfer::STATUS => MerchantConfig::STATUS_DENIED]);
+
+        $merchantCriteriaTransfer = (new MerchantCriteriaTransfer())
+            ->addStatus(MerchantConfig::STATUS_APPROVED);
+
+        // Act
+        $merchantCollectionTransfer = $this->tester->getFacade()->get($merchantCriteriaTransfer);
+
+        // Assert
+        $this->assertCount(1, $merchantCollectionTransfer->getMerchants());
+        $this->assertSame(
+            $approvedMerchantTransfer->getIdMerchant(),
+            $merchantCollectionTransfer->getMerchants()->offsetGet(0)->getIdMerchant(),
+        );
+    }
+
+    public function testGetReturnsEachMerchantOnceWhenItIsAssignedToSeveralOfTheRequestedStores(): void
+    {
+        // Arrange
+        $this->tester->truncateMerchantRelations();
+        $firstStoreTransfer = $this->tester->haveStore([StoreTransfer::NAME => static::STORE_NAME_FIRST]);
+        $secondStoreTransfer = $this->tester->haveStore([StoreTransfer::NAME => static::STORE_NAME_SECOND]);
+        $this->tester->haveMerchant([
+            MerchantTransfer::STORE_RELATION => [
+                StoreRelationTransfer::ID_STORES => [
+                    $firstStoreTransfer->getIdStoreOrFail(),
+                    $secondStoreTransfer->getIdStoreOrFail(),
+                ],
+            ],
+        ]);
+
+        $merchantCriteriaTransfer = (new MerchantCriteriaTransfer())
+            ->addStoreName(static::STORE_NAME_FIRST)
+            ->addStoreName(static::STORE_NAME_SECOND);
+
+        // Act
+        $merchantCollectionTransfer = $this->tester->getFacade()->get($merchantCriteriaTransfer);
+
+        // Assert
+        $this->assertCount(1, $merchantCollectionTransfer->getMerchants());
+    }
+
+    public function testGetMatchesTheSearchTermAgainstTheMerchantNameCaseInsensitively(): void
+    {
+        // Arrange
+        $this->tester->truncateMerchantRelations();
+        $merchantTransfer = $this->tester->haveMerchant([MerchantTransfer::NAME => static::SEARCHABLE_MERCHANT_NAME]);
+        $this->tester->haveMerchant([MerchantTransfer::NAME => static::NON_MATCHING_MERCHANT_NAME]);
+
+        $merchantCriteriaTransfer = (new MerchantCriteriaTransfer())
+            ->setSearchTerm(static::SEARCH_TERM_IN_DIFFERENT_CASE);
+
+        // Act
+        $merchantCollectionTransfer = $this->tester->getFacade()->get($merchantCriteriaTransfer);
+
+        // Assert
+        $this->assertCount(1, $merchantCollectionTransfer->getMerchants());
+        $this->assertSame(
+            $merchantTransfer->getIdMerchant(),
+            $merchantCollectionTransfer->getMerchants()->offsetGet(0)->getIdMerchant(),
+        );
     }
 
     public function testReturnsMerchantsPaginatedByLimitAndOffset(): void

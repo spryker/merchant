@@ -52,7 +52,8 @@ class MerchantExpander implements MerchantExpanderInterface
      */
     protected function executeMerchantSingleExpanderPlugins(MerchantCollectionTransfer $merchantCollectionTransfer): MerchantCollectionTransfer
     {
-        $resultMerchantCollectionTransfer = new MerchantCollectionTransfer();
+        $resultMerchantCollectionTransfer = (new MerchantCollectionTransfer())
+            ->setPagination($merchantCollectionTransfer->getPagination());
 
         foreach ($merchantCollectionTransfer->getMerchants() as $merchantTransfer) {
             foreach ($this->merchantExpanderPlugins as $merchantExpanderPlugin) {

@@ -18,6 +18,7 @@ use Spryker\Zed\Merchant\Business\Exception\MerchantNotSavedException;
 use Spryker\Zed\Merchant\Business\MerchantUrlSaver\MerchantUrlSaverInterface;
 use Spryker\Zed\Merchant\Business\Status\MerchantStatusValidatorInterface;
 use Spryker\Zed\Merchant\Business\Trigger\MerchantEventTriggerInterface;
+use Spryker\Zed\Merchant\Business\Validator\MerchantValidatorInterface;
 use Spryker\Zed\Merchant\Dependency\Facade\MerchantToEventFacadeInterface;
 use Spryker\Zed\Merchant\Dependency\MerchantEvents;
 use Spryker\Zed\Merchant\Persistence\MerchantEntityManagerInterface;
@@ -27,15 +28,9 @@ class MerchantUpdater implements MerchantUpdaterInterface
 {
     use TransactionTrait;
 
-    /**
-     * @var string
-     */
-    protected const ERROR_MESSAGE_MERCHANT_NOT_FOUND = 'Merchant is not found.';
+    protected const string ERROR_MESSAGE_MERCHANT_NOT_FOUND = 'Merchant is not found.';
 
-    /**
-     * @var string
-     */
-    protected const ERROR_MESSAGE_MERCHANT_STATUS_TRANSITION_NOT_VALID = 'Merchant status transition is not valid.';
+    protected const string ERROR_MESSAGE_MERCHANT_STATUS_TRANSITION_NOT_VALID = 'Merchant status transition is not valid.';
 
     /**
      * @var \Spryker\Zed\Merchant\Persistence\MerchantEntityManagerInterface
@@ -80,6 +75,7 @@ class MerchantUpdater implements MerchantUpdaterInterface
      * @param \Spryker\Zed\Merchant\Business\MerchantUrlSaver\MerchantUrlSaverInterface $merchantUrlSaver
      * @param \Spryker\Zed\Merchant\Dependency\Facade\MerchantToEventFacadeInterface $eventFacade
      * @param \Spryker\Zed\Merchant\Business\Trigger\MerchantEventTriggerInterface $merchantEventTrigger
+     * @param \Spryker\Zed\Merchant\Business\Validator\MerchantValidatorInterface $merchantValidator
      */
     public function __construct(
         MerchantEntityManagerInterface $merchantEntityManager,
@@ -88,7 +84,8 @@ class MerchantUpdater implements MerchantUpdaterInterface
         array $merchantPostUpdatePlugins,
         MerchantUrlSaverInterface $merchantUrlSaver,
         MerchantToEventFacadeInterface $eventFacade,
-        MerchantEventTriggerInterface $merchantEventTrigger
+        MerchantEventTriggerInterface $merchantEventTrigger,
+        protected MerchantValidatorInterface $merchantValidator
     ) {
         $this->merchantEntityManager = $merchantEntityManager;
         $this->merchantRepository = $merchantRepository;
@@ -103,6 +100,7 @@ class MerchantUpdater implements MerchantUpdaterInterface
     {
         $this->assertDefaultMerchantRequirements($merchantTransfer);
         $merchantTransfer->requireIdMerchant();
+        $merchantTransfer->setIdMerchant((int)$merchantTransfer->getIdMerchant());
 
         $merchantResponseTransfer = $this->createMerchantResponseTransfer();
 
@@ -122,9 +120,18 @@ class MerchantUpdater implements MerchantUpdaterInterface
         $merchantStatus = $merchantTransfer->getStatus();
 
         if (!$this->merchantStatusValidator->isMerchantStatusTransitionValid($existingMerchantStatus, $merchantStatus)) {
-            $merchantResponseTransfer = $this->addMerchantError($merchantResponseTransfer, static::ERROR_MESSAGE_MERCHANT_STATUS_TRANSITION_NOT_VALID);
+            $merchantResponseTransfer = $this->addMerchantError(
+                $merchantResponseTransfer,
+                static::ERROR_MESSAGE_MERCHANT_STATUS_TRANSITION_NOT_VALID,
+            );
 
             return $merchantResponseTransfer;
+        }
+
+        $validationMerchantResponseTransfer = $this->merchantValidator->validate($merchantTransfer);
+
+        if (!$validationMerchantResponseTransfer->getIsSuccess()) {
+            return $validationMerchantResponseTransfer;
         }
 
         try {
@@ -257,9 +264,13 @@ class MerchantUpdater implements MerchantUpdaterInterface
             ->requireStoreRelation();
     }
 
-    protected function addMerchantError(MerchantResponseTransfer $merchantResponseTransfer, string $message): MerchantResponseTransfer
-    {
-        $merchantResponseTransfer->addError((new MerchantErrorTransfer())->setMessage($message));
+    protected function addMerchantError(
+        MerchantResponseTransfer $merchantResponseTransfer,
+        string $message
+    ): MerchantResponseTransfer {
+        $merchantResponseTransfer->addError(
+            (new MerchantErrorTransfer())->setMessage($message),
+        );
 
         return $merchantResponseTransfer;
     }

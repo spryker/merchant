@@ -20,26 +20,35 @@ class MerchantConfig extends AbstractBundleConfig
 {
     protected const string CHECKOUT_ERROR_TYPE = 'MerchantUnavailable';
 
+    protected const int MERCHANT_URL_MAX_LENGTH = 255;
+
+    protected const string MERCHANT_URL_PREFIX = 'merchant';
+
     /**
      * @api
-     *
-     * @var string
      */
-    public const STATUS_WAITING_FOR_APPROVAL = 'waiting-for-approval';
+    public const string STATUS_WAITING_FOR_APPROVAL = 'waiting-for-approval';
+
+    /**
+     * @api
+     */
+    public const string STATUS_APPROVED = 'approved';
+
+    /**
+     * @api
+     */
+    public const string STATUS_DENIED = 'denied';
 
     /**
      * @api
      *
-     * @var string
+     * @var array<string>
      */
-    public const STATUS_APPROVED = 'approved';
-
-    /**
-     * @api
-     *
-     * @var string
-     */
-    public const STATUS_DENIED = 'denied';
+    public const array SUPPORTED_STATUSES = [
+        self::STATUS_WAITING_FOR_APPROVAL,
+        self::STATUS_APPROVED,
+        self::STATUS_DENIED,
+    ];
 
     /**
      * Specification:
@@ -60,6 +69,44 @@ class MerchantConfig extends AbstractBundleConfig
     public function getDefaultMerchantStatus(): string
     {
         return static::STATUS_WAITING_FOR_APPROVAL;
+    }
+
+    /**
+     * Specification:
+     * - Returns the maximum number of characters a merchant URL may have.
+     *
+     * @uses \Orm\Zed\Url\Persistence\Map\SpyUrlTableMap - `spy_url.url` is a `VARCHAR(255)`.
+     *
+     * @api
+     *
+     * @return int
+     */
+    public function getMerchantUrlMaxLength(): int
+    {
+        return static::MERCHANT_URL_MAX_LENGTH;
+    }
+
+    /**
+     * Specification:
+     * - Returns the URL path segment used to build a merchant's localized URL, e.g. `/de/merchant/`.
+     *
+     * @api
+     *
+     * @return string
+     */
+    public function getMerchantUrlPrefix(): string
+    {
+        return static::MERCHANT_URL_PREFIX;
+    }
+
+    /**
+     * @api
+     *
+     * @return array<string>
+     */
+    public function getSupportedMerchantStatuses(): array
+    {
+        return static::SUPPORTED_STATUSES;
     }
 
     /**
@@ -117,7 +164,7 @@ class MerchantConfig extends AbstractBundleConfig
      *
      * @deprecated Will be removed without replacement.
      *
-     * @return array
+     * @return array<string, string>
      */
     public function getMerchantFieldsForMerchantEventMessage(): array
     {
@@ -133,7 +180,7 @@ class MerchantConfig extends AbstractBundleConfig
      *
      * @deprecated Will be removed without replacement.
      *
-     * @return array
+     * @return array<string, array<string, string>>
      */
     public function getMerchantStoreRelationFieldsForMerchantEventMessage(): array
     {

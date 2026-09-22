@@ -47,4 +47,9 @@ class MerchantToUrlFacadeBridge implements MerchantToUrlFacadeInterface
     {
         return $this->urlFacade->updateUrl($urlTransfer);
     }
+
+    public function findUrlCaseInsensitive(UrlTransfer $urlTransfer): ?UrlTransfer
+    {
+        return $this->urlFacade->findUrlCaseInsensitive($urlTransfer);
+    }
 }

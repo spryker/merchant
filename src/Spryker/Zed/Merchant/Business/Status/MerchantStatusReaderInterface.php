@@ -15,4 +15,9 @@ interface MerchantStatusReaderInterface
      * @return array<string>
      */
     public function getApplicableMerchantStatuses(string $currentStatus): array;
+
+    /**
+     * @return array<string>
+     */
+    public function getSupportedStatuses(): array;
 }

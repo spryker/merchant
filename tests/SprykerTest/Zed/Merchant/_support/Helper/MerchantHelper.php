@@ -7,6 +7,7 @@
 
 namespace SprykerTest\Zed\Merchant\Helper;
 
+use ArrayObject;
 use Codeception\Module;
 use Generated\Shared\DataBuilder\MerchantBuilder;
 use Generated\Shared\DataBuilder\MerchantProfileBuilder;
@@ -15,6 +16,7 @@ use Generated\Shared\Transfer\MerchantProfileTransfer;
 use Generated\Shared\Transfer\MerchantTransfer;
 use Generated\Shared\Transfer\StoreRelationTransfer;
 use Generated\Shared\Transfer\StoreTransfer;
+use Generated\Shared\Transfer\UrlTransfer;
 use Orm\Zed\Merchant\Persistence\SpyMerchantQuery;
 use Spryker\Zed\Merchant\MerchantConfig;
 use SprykerTest\Shared\Store\Helper\StoreDataHelperTrait;
@@ -144,7 +146,33 @@ class MerchantHelper extends Module
         $merchantTransfer->setIdMerchant(null);
         $merchantTransfer = $this->addStoreRelation($merchantTransfer, $seedData);
 
+        if (!isset($seedData[MerchantTransfer::URL_COLLECTION])) {
+            $merchantTransfer->setUrlCollection($this->buildUrlCollectionForEveryLocale());
+        }
+
         return $merchantTransfer;
+    }
+
+    /**
+     * Every merchant validator requires a URL per locale, the same requirement the Back Office form
+     * enforces - see {@link \Spryker\Zed\Merchant\Business\Validator\UrlMerchantValidator}.
+     *
+     * @return \ArrayObject<int, \Generated\Shared\Transfer\UrlTransfer>
+     */
+    protected function buildUrlCollectionForEveryLocale(): ArrayObject
+    {
+        $urlCollection = new ArrayObject();
+
+        foreach ($this->getLocator()->locale()->facade()->getLocaleCollection() as $localeTransfer) {
+            $urlCollection->append(
+                (new UrlTransfer())
+                    ->setFkLocale($localeTransfer->getIdLocale())
+                    ->setLocaleName($localeTransfer->getLocaleName())
+                    ->setUrl('/' . $localeTransfer->getLocaleName() . '/' . uniqid('merchant-')),
+            );
+        }
+
+        return $urlCollection;
     }
 
     protected function buildMerchantProfileTransfer(array $seed = []): MerchantProfileTransfer

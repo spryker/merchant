@@ -1,0 +1,253 @@
+resource:
+    name: Merchants
+    shortName: merchants
+    description: 'Merchant lifecycle management (list, read, create and update)'
+
+    provider: Spryker\Glue\Merchant\Api\Backend\Provider\MerchantsBackendProvider
+    processor: Spryker\Glue\Merchant\Api\Backend\Processor\MerchantsBackendProcessor
+
+    paginationEnabled: true
+    paginationItemsPerPage: 10
+    paginationMaximumItemsPerPage: 100
+
+    security: "is_granted('ROLE_BACK_OFFICE_USER')"
+
+    operations:
+        - type: GetCollection
+          description: 'Retrieve a paginated, filterable merchant collection. The default order is by name.'
+          openapiContext:
+              summary: 'List merchants'
+              parameters:
+                  - name: sort
+                    in: query
+                    required: false
+                    description: >-
+                        Order the collection by a single field, prefixed with `-` for descending. Several
+                        fields at once are refused with error code 1309, an unsupported field with 1303.
+                    schema:
+                        type: string
+                        enum: ['name', '-name', 'merchantReference', '-merchantReference', 'status', '-status']
+                  - name: 'filter[merchants.isActive]'
+                    in: query
+                    required: false
+                    description: >-
+                        Narrow to active or inactive merchants. A value outside the boolean vocabulary is
+                        refused with error code 1313 rather than read as false.
+                    schema:
+                        type: boolean
+                  - name: 'filter[merchants.statuses]'
+                    in: query
+                    required: false
+                    description: >-
+                        Narrow to several approval statuses. Accepted both as a comma-separated value and
+                        as a repeated parameter. An unknown status is refused with error code 1316.
+                    schema:
+                        type: string
+                        example: 'approved,denied'
+                  - name: 'filter[merchants.stores]'
+                    in: query
+                    required: false
+                    description: >-
+                        Narrow to the merchants of several stores. Accepted both as a comma-separated
+                        value and as a repeated parameter.
+                    schema:
+                        type: string
+                        example: 'DE,AT'
+                  - name: 'filter[merchants.q]'
+                    in: query
+                    required: false
+                    description: >-
+                        Narrow to the merchants whose name or merchant reference contains the term,
+                        case-insensitive.
+                    schema:
+                        type: string
+              responses:
+                  200:
+                      description: 'Merchant collection returned, with JSON:API pagination links.'
+                  400:
+                      description: 'Unsupported sort field (error code 1303).'
+                  401:
+                      description: 'Missing or expired access token.'
+                  403:
+                      description: 'The operator has no ACL access to this resource.'
+
+        - type: Get
+          description: 'Retrieve a single merchant by merchant reference.'
+          openapiContext:
+              summary: 'Retrieve a merchant'
+              responses:
+                  200:
+                      description: 'Merchant returned.'
+                  401:
+                      description: 'Missing or expired access token.'
+                  403:
+                      description: 'The operator has no ACL access to this resource.'
+                  404:
+                      description: 'No merchant matches the reference (error code 1301).'
+
+        - type: Post
+          description: 'Create a merchant.'
+          deserialize: true
+          openapiContext:
+              summary: 'Create a merchant'
+              responses:
+                  201:
+                      description: 'Merchant created.'
+                  401:
+                      description: 'Missing or expired access token.'
+                  403:
+                      description: 'The operator has no ACL access to this resource.'
+                  422:
+                      description: >-
+                          Schema validation failed, or the merchant was rejected - an unknown store
+                          (error code 1304), an unknown locale (error code 1305), or any other validation
+                          failure such as a duplicate email, a duplicate merchant reference or a duplicate
+                          or blank merchant URL (error code 1302).
+                  500:
+                      description: 'The merchant was rejected without a reported reason (error code 1314).'
+
+        - type: Patch
+          description: 'Partially update a merchant. Only the properties present in the payload are applied.'
+          deserialize: true
+          openapiContext:
+              summary: 'Update a merchant'
+              responses:
+                  200:
+                      description: 'Merchant updated.'
+                  401:
+                      description: 'Missing or expired access token.'
+                  403:
+                      description: 'The operator has no ACL access to this resource.'
+                  404:
+                      description: 'No merchant matches the reference (error code 1301).'
+                  422:
+                      description: >-
+                          Schema validation failed, or the update was rejected - an unknown store
+                          (error code 1304), an unknown locale (error code 1305), or any other validation
+                          failure such as a status transition not allowed from the current status, a
+                          duplicate email or a duplicate or blank merchant URL (error code 1302).
+                  500:
+                      description: 'The update was rejected without a reported reason (error code 1314).'
+
+    properties:
+        merchantReference:
+            type: string
+            identifier: true
+            writable: true
+            readable: true
+            required: true
+            description: >-
+                Public unique merchant identifier. Addresses the merchant in every operation and is supplied by
+                the client on create. It cannot be changed afterwards. Also one of the fields the collection
+                search term matches against.
+            openapiContext:
+                example: 'MER000001'
+
+        name:
+            type: string
+            writable: true
+            readable: true
+            required: true
+            description: 'Merchant name. Also one of the fields the collection search term matches against.'
+            openapiContext:
+                example: 'Spryker Merchant'
+
+        email:
+            type: string
+            writable: true
+            readable: true
+            required: true
+            description: 'Merchant contact email address. Unique across merchants.'
+            openapiContext:
+                example: 'merchant@spryker.local'
+
+        registrationNumber:
+            type: string
+            nullable: true
+            writable: true
+            readable: true
+            required: false
+            description: 'Official business registration number of the merchant.'
+            openapiContext:
+                example: 'HRB 12345'
+
+        status:
+            type: string
+            writable: true
+            readable: true
+            required: false
+            description: >-
+                Approval status of the merchant. On create it defaults to `waiting-for-approval`. On update
+                only a transition allowed from the current status is accepted: `waiting-for-approval` to
+                `approved` or `denied`, `approved` to `denied`, `denied` to `approved`. Repeating the current
+                status is accepted and changes nothing.
+            openapiContext:
+                example: 'waiting-for-approval'
+                enum: ['waiting-for-approval', 'approved', 'denied']
+
+        isActive:
+            type: boolean
+            writable: true
+            readable: true
+            required: false
+            description: 'Whether the merchant is active. On create it defaults to `false`.'
+            openapiContext:
+                example: true
+
+        stores:
+            type: array
+            nullable: true
+            writable: true
+            readable: true
+            required: false
+            description: >-
+                Names of the stores the merchant is assigned to. Sending the property replaces the whole
+                assignment, including an empty array, which clears it entirely. Omitting the property leaves
+                the current assignment unchanged. An unknown store name is rejected.
+            openapiContext:
+                items:
+                    type: string
+                example: ['DE', 'AT']
+
+        merchantUrls:
+            type: array
+            nullable: true
+            writable: true
+            readable: true
+            required: false
+            description: >-
+                Storefront URLs of the merchant, one per locale. Each entry needs `localeName` and the full
+                `url` path and upserts the URL of that locale; a locale absent from the payload keeps its
+                current URL, because merchant URLs cannot be deleted. The `url` is taken as given - no locale
+                prefix is added to it. On create, every locale must end up with a non-blank URL - either sent
+                in this payload or, on Patch, already present from a prior write - matching the requirement
+                the Back Office form enforces.
+            openapiContext:
+                items:
+                    type: object
+                    properties:
+                        localeName:
+                            type: string
+                            example: 'de_DE'
+                        url:
+                            type: string
+                            example: '/de/merchant/spryker-merchant'
+                example:
+                    - localeName: 'de_DE'
+                      url: '/de/merchant/spryker-merchant'
+                    - localeName: 'en_US'
+                      url: '/en/merchant/spryker-merchant'
+
+        warehouses:
+            type: array
+            nullable: true
+            writable: false
+            readable: true
+            required: false
+            description: >-
+                Names of the warehouses assigned to the merchant. Read-only: the warehouse assignment is not
+                managed through this resource.
+            openapiContext:
+                items:
+                    type: string
+                example: ['Warehouse1']

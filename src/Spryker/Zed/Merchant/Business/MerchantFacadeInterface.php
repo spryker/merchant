@@ -7,6 +7,7 @@
 
 namespace Spryker\Zed\Merchant\Business;
 
+use Generated\Shared\Transfer\LocaleTransfer;
 use Generated\Shared\Transfer\MerchantCollectionTransfer;
 use Generated\Shared\Transfer\MerchantCriteriaTransfer;
 use Generated\Shared\Transfer\MerchantExportCriteriaTransfer;
@@ -28,12 +29,14 @@ interface MerchantFacadeInterface
      *   - contactPersonPhone
      *   - email
      *   - storeRelation
+     * - Validates the merchant with the {@link \Spryker\Zed\MerchantExtension\Dependency\Plugin\MerchantValidatorPluginInterface} stack, which rejects an email, a merchant reference or a merchant URL another merchant already uses.
+     * - Returns MerchantResponseTransfer.isSuccess=false and error messages if validation fails, without persisting anything.
      * - Persists the entity to DB.
      * - Sets ID to the returning transfer.
      * - Creates merchant to store relations based on `MerchantTransfer.storeRelation.stores` and `MerchantTransfer.storeRelation.idStores`.
      * - Calls a stack of `MerchantPostCreatePluginInterface` after merchant is created.
-     * - Returns MerchantResponseTransfer.isSuccessful=false and error messages if merchant status transition is not valid.
-     * - Returns MerchantResponseTransfer.isSuccessful=true and MerchantResponseTransfer.merchant.idMerchant is set from newly created entity.
+     * - Returns MerchantResponseTransfer.isSuccess=false and error messages if merchant status transition is not valid.
+     * - Returns MerchantResponseTransfer.isSuccess=true and MerchantResponseTransfer.merchant.idMerchant is set from newly created entity.
      *
      * @api
      *
@@ -57,10 +60,12 @@ interface MerchantFacadeInterface
      *   - email
      *   - storeRelation
      * - Calls a stack of `MerchantPostUpdatePluginInterface` after merchant is updated.
-     * - Returns MerchantResponseTransfer.isSuccessful=false and error messages if merchant not found.
-     * - Returns MerchantResponseTransfer.isSuccessful=false and error messages if merchant status transition is not valid.
+     * - Returns MerchantResponseTransfer.isSuccess=false and error messages if merchant not found.
+     * - Returns MerchantResponseTransfer.isSuccess=false and error messages if merchant status transition is not valid.
+     * - Validates the merchant with the {@link \Spryker\Zed\MerchantExtension\Dependency\Plugin\MerchantValidatorPluginInterface} stack, which rejects an email, a merchant reference or a merchant URL another merchant already uses.
+     * - Returns MerchantResponseTransfer.isSuccess=false and error messages if validation fails, without persisting anything.
      * - Persists the entity to DB.
-     * - Returns MerchantResponseTransfer.isSuccessful=true and updated MerchantTransfer.
+     * - Returns MerchantResponseTransfer.isSuccess=true and updated MerchantTransfer.
      *
      * @api
      *
@@ -166,4 +171,27 @@ interface MerchantFacadeInterface
      * @return void
      */
     public function emitPublishMerchantToMessageBroker(MerchantPublisherConfigTransfer $merchantPublisherConfigTransfer): void;
+
+    /**
+     * Specification:
+     * - Builds the localized merchant URL prefix for the given locale, e.g. `/de/merchant/`.
+     * - Used to keep merchant URLs consistent between the Back Office form and the Merchant Backend API.
+     *
+     * @api
+     *
+     * @param \Generated\Shared\Transfer\LocaleTransfer $localeTransfer
+     *
+     * @return string
+     */
+    public function buildMerchantUrlPrefixForLocale(LocaleTransfer $localeTransfer): string;
+
+    /**
+     * Specification:
+     * - Returns the merchant approval statuses accepted by this module, e.g. `waiting-for-approval`, `approved`, `denied`.
+     *
+     * @api
+     *
+     * @return array<string>
+     */
+    public function getMerchantStatuses(): array;
 }

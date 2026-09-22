@@ -21,71 +21,49 @@ use Spryker\Zed\Merchant\Dependency\Service\MerchantToUtilTextServiceBridge;
  */
 class MerchantDependencyProvider extends AbstractBundleDependencyProvider
 {
-    /**
-     * @var string
-     */
-    public const FACADE_URL = 'FACADE_URL';
+    public const string FACADE_URL = 'FACADE_URL';
 
-    /**
-     * @var string
-     */
-    public const FACADE_EVENT = 'FACADE_EVENT';
+    public const string FACADE_EVENT = 'FACADE_EVENT';
 
-    /**
-     * @var string
-     */
-    public const SERVICE_UTIL_TEXT = 'SERVICE_UTIL_TEXT';
+    public const string SERVICE_UTIL_TEXT = 'SERVICE_UTIL_TEXT';
 
-    /**
-     * @var string
-     */
-    public const PLUGINS_MERCHANT_POST_CREATE = 'PLUGINS_MERCHANT_POST_CREATE';
+    public const string PLUGINS_MERCHANT_POST_CREATE = 'PLUGINS_MERCHANT_POST_CREATE';
 
-    /**
-     * @var string
-     */
-    public const PLUGINS_MERCHANT_POST_UPDATE = 'PLUGINS_MERCHANT_POST_UPDATE';
+    public const string PLUGINS_MERCHANT_POST_UPDATE = 'PLUGINS_MERCHANT_POST_UPDATE';
+
+    public const string PLUGINS_MERCHANT_VALIDATOR = 'PLUGINS_MERCHANT_VALIDATOR';
 
     /**
      * @deprecated Use {@link \Spryker\Zed\Merchant\MerchantDependencyProvider::PLUGINS_MERCHANT_BULK_EXPANDER} instead.
-     *
-     * @var string
      */
-    public const PLUGINS_MERCHANT_EXPANDER = 'PLUGINS_MERCHANT_EXPANDER';
+    public const string PLUGINS_MERCHANT_EXPANDER = 'PLUGINS_MERCHANT_EXPANDER';
 
-    /**
-     * @var string
-     */
-    public const PLUGINS_MERCHANT_BULK_EXPANDER = 'PLUGINS_MERCHANT_BULK_EXPANDER';
+    public const string PLUGINS_MERCHANT_BULK_EXPANDER = 'PLUGINS_MERCHANT_BULK_EXPANDER';
 
-    /**
-     * @var string
-     */
-    public const PROPEL_QUERY_URL = 'PROPEL_QUERY_URL';
+    public const string PROPEL_QUERY_URL = 'PROPEL_QUERY_URL';
 
     /**
      * @deprecated Will be removed without replacement.
-     *
-     * @var string
      */
-    public const FACADE_MESSAGE_BROKER = 'FACADE_MESSAGE_BROKER';
+    public const string FACADE_MESSAGE_BROKER = 'FACADE_MESSAGE_BROKER';
 
-    /**
-     * @var string
-     */
-    public const FACADE_STORE = 'FACADE_STORE';
+    public const string FACADE_STORE = 'FACADE_STORE';
+
+    public const string FACADE_LOCALE = 'FACADE_LOCALE';
 
     public function provideBusinessLayerDependencies(Container $container): Container
     {
         $container = $this->addUtilTextService($container);
         $container = $this->addMerchantPostCreatePlugins($container);
         $container = $this->addMerchantPostUpdatePlugins($container);
+        $container = $this->addMerchantValidatorPlugins($container);
         $container = $this->addMerchantExpanderPlugins($container);
         $container = $this->addMerchantBulkExpanderPlugins($container);
         $container = $this->addUrlFacade($container);
         $container = $this->addEventFacade($container);
         $container = $this->addMessageBrokerFacade($container);
         $container = $this->addStoreFacade($container);
+        $container = $this->addLocaleFacade($container);
 
         return $container;
     }
@@ -121,6 +99,15 @@ class MerchantDependencyProvider extends AbstractBundleDependencyProvider
     {
         $container->set(static::PLUGINS_MERCHANT_POST_UPDATE, function () {
             return $this->getMerchantPostUpdatePlugins();
+        });
+
+        return $container;
+    }
+
+    protected function addMerchantValidatorPlugins(Container $container): Container
+    {
+        $container->set(static::PLUGINS_MERCHANT_VALIDATOR, function () {
+            return $this->getMerchantValidatorPlugins();
         });
 
         return $container;
@@ -163,6 +150,14 @@ class MerchantDependencyProvider extends AbstractBundleDependencyProvider
      * @return array<\Spryker\Zed\MerchantExtension\Dependency\Plugin\MerchantPostCreatePluginInterface>
      */
     protected function getMerchantPostCreatePlugins(): array
+    {
+        return [];
+    }
+
+    /**
+     * @return array<\Spryker\Zed\MerchantExtension\Dependency\Plugin\MerchantValidatorPluginInterface>
+     */
+    protected function getMerchantValidatorPlugins(): array
     {
         return [];
     }
@@ -232,6 +227,15 @@ class MerchantDependencyProvider extends AbstractBundleDependencyProvider
     {
         $container->set(static::FACADE_STORE, function (Container $container) {
             return new MerchantToStoreFacadeBridge($container->getLocator()->store()->facade());
+        });
+
+        return $container;
+    }
+
+    protected function addLocaleFacade(Container $container): Container
+    {
+        $container->set(static::FACADE_LOCALE, function (Container $container) {
+            return $container->getLocator()->locale()->facade();
         });
 
         return $container;

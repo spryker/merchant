@@ -23,9 +23,13 @@
         <property name="filter" type="Filter"/>
         <property name="isActive" type="bool"/>
         <property name="status" type="string"/>
+        <property name="statuses" type="string[]" singular="status"/>
         <property name="pagination" type="Pagination"/>
         <property name="store" type="Store"/>
+        <property name="storeNames" type="string[]" singular="storeName"/>
+        <property name="searchTerm" type="string"/>
         <property name="withExpanders" type="bool" strict="true"/>
+        <property name="name" type="string"/>
     </transfer>
 
     <transfer name="Filter">
@@ -202,5 +206,20 @@
     </transfer>
 
     <transfer name="MessageResponse">
+    </transfer>
+
+    <transfer name="MerchantProfile">
+    </transfer>
+
+    <transfer name="LocaleCriteria">
+    </transfer>
+
+    <transfer name="LocaleConditions">
+    </transfer>
+
+    <transfer name="StoreCriteria">
+    </transfer>
+
+    <transfer name="StoreConditions">
     </transfer>
 </transfers>

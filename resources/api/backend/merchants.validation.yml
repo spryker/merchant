@@ -1,0 +1,70 @@
+post:
+    merchantReference:
+        - NotBlank:
+              message: 'validation.not_blank'
+        - Length:
+              max: 255
+              maxMessage: 'validation.max_length.plural'
+
+    name:
+        - NotBlank:
+              message: 'validation.not_blank'
+        - Length:
+              max: 255
+              maxMessage: 'validation.max_length.plural'
+
+    email:
+        - NotBlank:
+              message: 'validation.not_blank'
+        - Email:
+              message: 'validation.email'
+        - Length:
+              max: 255
+              maxMessage: 'validation.max_length.plural'
+
+    registrationNumber:
+        - Length:
+              max: 255
+              maxMessage: 'validation.max_length.plural'
+
+    status:
+        - Optional:
+              constraints:
+                  - Choice:
+                        choices: ['waiting-for-approval', 'approved', 'denied']
+                        message: 'validation.choice'
+
+patch:
+    name:
+        - Optional:
+              constraints:
+                  - NotBlank:
+                        message: 'validation.not_blank'
+                  - Length:
+                        max: 255
+                        maxMessage: 'validation.max_length.plural'
+
+    email:
+        - Optional:
+              constraints:
+                  - NotBlank:
+                        message: 'validation.not_blank'
+                  - Email:
+                        message: 'validation.email'
+                  - Length:
+                        max: 255
+                        maxMessage: 'validation.max_length.plural'
+
+    registrationNumber:
+        - Optional:
+              constraints:
+                  - Length:
+                        max: 255
+                        maxMessage: 'validation.max_length.plural'
+
+    status:
+        - Optional:
+              constraints:
+                  - Choice:
+                        choices: ['waiting-for-approval', 'approved', 'denied']
+                        message: 'validation.choice'

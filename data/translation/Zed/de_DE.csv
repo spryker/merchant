@@ -1,5 +1,11 @@
 approved,Genehmigt
 denied,Abgelehnt
+"Email is already used.","E-Mail wird bereits verwendet."
 "Merchant is not found.","Händler wurde nicht gefunden."
+"Merchant name is already used.","Händlername wird bereits verwendet."
+"Merchant reference is already used.","Händlerreferenz wird bereits verwendet."
 "Merchant status transition is not valid.","Der Händler-Statusübergang ist ungültig."
+"Merchant URL ""%s"" is longer than %d characters.","Händler-URL ""%s"" ist länger als %d Zeichen."
+"Merchant URL for locale ""%s"" must not be blank.","Händler-URL für Gebietsschema ""%s"" darf nicht leer sein."
+"Provided URL ""%s"" is already taken.","Die angegebene URL ""%s"" wird bereits verwendet."
 waiting-for-approval,"Warten auf Genehmigung"

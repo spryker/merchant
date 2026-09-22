@@ -28,4 +28,6 @@ interface MerchantToUrlFacadeInterface
      * @return \Generated\Shared\Transfer\UrlTransfer
      */
     public function updateUrl(UrlTransfer $urlTransfer);
+
+    public function findUrlCaseInsensitive(UrlTransfer $urlTransfer): ?UrlTransfer;
 }

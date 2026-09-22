@@ -1,5 +1,11 @@
 approved,Approved
 denied,Denied
+"Email is already used.","Email is already used."
 "Merchant is not found.","Merchant is not found."
+"Merchant name is already used.","Merchant name is already used."
+"Merchant reference is already used.","Merchant reference is already used."
 "Merchant status transition is not valid.","Merchant status transition is not valid."
+"Merchant URL ""%s"" is longer than %d characters.","Merchant URL ""%s"" is longer than %d characters."
+"Merchant URL for locale ""%s"" must not be blank.","Merchant URL for locale ""%s"" must not be blank."
+"Provided URL ""%s"" is already taken.","Provided URL ""%s"" is already taken."
 waiting-for-approval,"Waiting for Approval"

@@ -32,4 +32,9 @@ class MerchantStatusReader implements MerchantStatusReaderInterface
 
         return $statusTree[$currentStatus] ?? [];
     }
+
+    public function getSupportedStatuses(): array
+    {
+        return $this->merchantConfig->getSupportedMerchantStatuses();
+    }
 }

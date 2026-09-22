@@ -16,6 +16,8 @@ use Generated\Shared\Transfer\StoreRelationTransfer;
 use Generated\Shared\Transfer\UrlTransfer;
 use Orm\Zed\Merchant\Persistence\Map\SpyMerchantTableMap;
 use Orm\Zed\Merchant\Persistence\SpyMerchantQuery;
+use PDO;
+use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\Collection\Collection;
 use Propel\Runtime\Formatter\ObjectFormatter;
@@ -26,16 +28,26 @@ use Spryker\Zed\Kernel\Persistence\AbstractRepository;
  */
 class MerchantRepository extends AbstractRepository implements MerchantRepositoryInterface
 {
-    protected const DEFAULT_ORDER_COLUMN = SpyMerchantTableMap::COL_NAME;
+    protected const string DEFAULT_ORDER_COLUMN = SpyMerchantTableMap::COL_NAME;
+
+    protected const string SEARCH_TERM_CONDITION_NAME = 'searchTermMatchesName';
+
+    protected const string SEARCH_TERM_MERCHANT_REFERENCE_CONDITION_NAME = 'searchTermMatchesMerchantReference';
+
+    /**
+     * @var array<string, string>
+     */
+    protected const array SORTABLE_FIELD_COLUMN_MAP = [
+        MerchantTransfer::NAME => SpyMerchantTableMap::COL_NAME,
+        MerchantTransfer::MERCHANT_REFERENCE => SpyMerchantTableMap::COL_MERCHANT_REFERENCE,
+        MerchantTransfer::STATUS => SpyMerchantTableMap::COL_STATUS,
+    ];
 
     public function get(MerchantCriteriaTransfer $merchantCriteriaTransfer): MerchantCollectionTransfer
     {
         $merchantQuery = $this->getFactory()->createMerchantQuery();
 
-        $filterTransfer = $merchantCriteriaTransfer->getFilter();
-        if ($filterTransfer === null || !$filterTransfer->getOrderBy()) {
-            $filterTransfer = (new FilterTransfer())->setOrderBy(static::DEFAULT_ORDER_COLUMN);
-        }
+        $filterTransfer = $this->resolveOrderByFilterTransfer($merchantCriteriaTransfer->getFilter());
 
         $merchantQuery = $this->applyFilters($merchantQuery, $merchantCriteriaTransfer);
         $merchantQuery = $this->buildQueryFromCriteria($merchantQuery, $filterTransfer)->setFormatter(ObjectFormatter::class);
@@ -50,6 +62,17 @@ class MerchantRepository extends AbstractRepository implements MerchantRepositor
         $merchantCollectionTransfer->setPagination($merchantCriteriaTransfer->getPagination());
 
         return $merchantCollectionTransfer;
+    }
+
+    protected function resolveOrderByFilterTransfer(?FilterTransfer $filterTransfer): FilterTransfer
+    {
+        $sortField = $filterTransfer?->getOrderBy();
+
+        if ($sortField === null) {
+            return (new FilterTransfer())->setOrderBy(static::DEFAULT_ORDER_COLUMN);
+        }
+
+        return $filterTransfer->setOrderBy(static::SORTABLE_FIELD_COLUMN_MAP[$sortField] ?? $sortField);
     }
 
     public function findOne(MerchantCriteriaTransfer $merchantCriteriaTransfer): ?MerchantTransfer
@@ -150,6 +173,10 @@ class MerchantRepository extends AbstractRepository implements MerchantRepositor
             $merchantQuery->filterByEmail($merchantCriteriaTransfer->getEmail());
         }
 
+        if ($merchantCriteriaTransfer->getName() !== null) {
+            $merchantQuery->filterByName($merchantCriteriaTransfer->getName());
+        }
+
         if ($merchantCriteriaTransfer->getMerchantReference() !== null) {
             $merchantQuery->filterByMerchantReference($merchantCriteriaTransfer->getMerchantReference());
         }
@@ -170,13 +197,64 @@ class MerchantRepository extends AbstractRepository implements MerchantRepositor
             $merchantQuery->filterByStatus($merchantCriteriaTransfer->getStatus());
         }
 
-        if ($merchantCriteriaTransfer->getStore() !== null) {
-            $merchantQuery->useSpyMerchantStoreQuery()
-                    ->useSpyStoreQuery()
-                        ->filterByName($merchantCriteriaTransfer->getStore()->getName())
-                    ->endUse()
-                ->endUse();
+        if ($merchantCriteriaTransfer->getStatuses()) {
+            $merchantQuery->filterByStatus_In($merchantCriteriaTransfer->getStatuses());
         }
+
+        if ($merchantCriteriaTransfer->getSearchTerm() !== null) {
+            $searchTermPattern = '%' . mb_strtolower($merchantCriteriaTransfer->getSearchTerm()) . '%';
+
+            $merchantQuery
+                ->condition(
+                    static::SEARCH_TERM_CONDITION_NAME,
+                    'LOWER(' . SpyMerchantTableMap::COL_NAME . ') LIKE ?',
+                    $searchTermPattern,
+                    PDO::PARAM_STR,
+                )
+                ->condition(
+                    static::SEARCH_TERM_MERCHANT_REFERENCE_CONDITION_NAME,
+                    'LOWER(' . SpyMerchantTableMap::COL_MERCHANT_REFERENCE . ') LIKE ?',
+                    $searchTermPattern,
+                    PDO::PARAM_STR,
+                )
+                ->combine(
+                    [static::SEARCH_TERM_CONDITION_NAME, static::SEARCH_TERM_MERCHANT_REFERENCE_CONDITION_NAME],
+                    Criteria::LOGICAL_OR,
+                );
+        }
+
+        $merchantQuery = $this->applyStoreFilters($merchantQuery, $merchantCriteriaTransfer);
+
+        return $merchantQuery;
+    }
+
+    protected function applyStoreFilters(
+        SpyMerchantQuery $merchantQuery,
+        MerchantCriteriaTransfer $merchantCriteriaTransfer
+    ): SpyMerchantQuery {
+        $storeNames = $merchantCriteriaTransfer->getStoreNames();
+        $storeTransfer = $merchantCriteriaTransfer->getStore();
+
+        if ($storeTransfer !== null) {
+            $storeNames[] = $storeTransfer->getName();
+        }
+
+        $storeNames = array_unique($storeNames);
+
+        if (!$storeNames) {
+            return $merchantQuery;
+        }
+
+        if (count($storeNames) > 1) {
+            $merchantQuery->groupByIdMerchant();
+        }
+
+        $merchantQuery
+            ->useSpyMerchantStoreQuery()
+                ->useSpyStoreQuery()
+                    ->filterByName_In($storeNames)
+                ->endUse()
+            ->endUse();
 
         return $merchantQuery;
     }
