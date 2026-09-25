@@ -15,10 +15,13 @@ use Generated\Shared\Transfer\MerchantTransfer;
 class MerchantValidator implements MerchantValidatorInterface
 {
     /**
+     * @param list<\Spryker\Zed\Merchant\Business\Validator\MerchantValidatorInterface> $merchantValidators
      * @param array<\Spryker\Zed\MerchantExtension\Dependency\Plugin\MerchantValidatorPluginInterface> $merchantValidatorPlugins
      */
-    public function __construct(protected array $merchantValidatorPlugins)
-    {
+    public function __construct(
+        protected array $merchantValidators,
+        protected array $merchantValidatorPlugins
+    ) {
     }
 
     public function validate(MerchantTransfer $merchantTransfer): MerchantResponseTransfer
@@ -26,6 +29,13 @@ class MerchantValidator implements MerchantValidatorInterface
         $merchantResponseTransfer = (new MerchantResponseTransfer())
             ->setIsSuccess(true)
             ->setMerchant($merchantTransfer);
+
+        foreach ($this->merchantValidators as $merchantValidator) {
+            $merchantResponseTransfer = $this->mergeValidationResult(
+                $merchantResponseTransfer,
+                $merchantValidator->validate($merchantTransfer),
+            );
+        }
 
         foreach ($this->merchantValidatorPlugins as $merchantValidatorPlugin) {
             $merchantResponseTransfer = $this->mergeValidationResult(

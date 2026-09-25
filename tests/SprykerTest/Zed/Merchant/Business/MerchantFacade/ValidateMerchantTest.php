@@ -12,10 +12,6 @@ use Codeception\Test\Unit;
 use Generated\Shared\Transfer\MerchantErrorTransfer;
 use Generated\Shared\Transfer\MerchantResponseTransfer;
 use Generated\Shared\Transfer\MerchantTransfer;
-use Spryker\Zed\Merchant\Communication\Plugin\Merchant\UniqueEmailMerchantValidatorPlugin;
-use Spryker\Zed\Merchant\Communication\Plugin\Merchant\UniqueMerchantReferenceMerchantValidatorPlugin;
-use Spryker\Zed\Merchant\Communication\Plugin\Merchant\UniqueNameMerchantValidatorPlugin;
-use Spryker\Zed\Merchant\Communication\Plugin\Merchant\UrlMerchantValidatorPlugin;
 use Spryker\Zed\Merchant\MerchantDependencyProvider;
 use Spryker\Zed\MerchantExtension\Dependency\Plugin\MerchantValidatorPluginInterface;
 
@@ -49,12 +45,7 @@ class ValidateMerchantTest extends Unit
     {
         parent::setUp();
 
-        $this->tester->setDependency(MerchantDependencyProvider::PLUGINS_MERCHANT_VALIDATOR, [
-            new UniqueEmailMerchantValidatorPlugin(),
-            new UniqueMerchantReferenceMerchantValidatorPlugin(),
-            new UniqueNameMerchantValidatorPlugin(),
-            new UrlMerchantValidatorPlugin(),
-        ]);
+        $this->tester->setDependency(MerchantDependencyProvider::PLUGINS_MERCHANT_VALIDATOR, []);
     }
 
     public function testCreateMerchantRejectsAnEmailAnotherMerchantAlreadyUses(): void

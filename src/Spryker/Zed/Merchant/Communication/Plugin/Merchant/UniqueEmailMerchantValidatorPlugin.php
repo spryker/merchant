@@ -15,6 +15,8 @@ use Spryker\Zed\Kernel\Communication\AbstractPlugin;
 use Spryker\Zed\MerchantExtension\Dependency\Plugin\MerchantValidatorPluginInterface;
 
 /**
+ * @deprecated Will be removed without replacement. The validation is applied by {@link \Spryker\Zed\Merchant\Business\MerchantFacadeInterface::createMerchant()} and {@link \Spryker\Zed\Merchant\Business\MerchantFacadeInterface::updateMerchant()} out of the box. Remove the plugin from {@link \Spryker\Zed\Merchant\MerchantDependencyProvider::getMerchantValidatorPlugins()}, otherwise the violation is reported twice.
+ *
  * @method \Spryker\Zed\Merchant\Business\MerchantBusinessFactory getBusinessFactory()
  * @method \Spryker\Zed\Merchant\Business\MerchantFacadeInterface getFacade()
  * @method \Spryker\Zed\Merchant\Communication\MerchantCommunicationFactory getFactory()

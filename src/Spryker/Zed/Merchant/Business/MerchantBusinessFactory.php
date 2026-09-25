@@ -100,7 +100,15 @@ class MerchantBusinessFactory extends AbstractBusinessFactory
 
     public function createMerchantValidator(): MerchantValidatorInterface
     {
-        return new MerchantValidator($this->getMerchantValidatorPlugins());
+        return new MerchantValidator(
+            [
+                $this->createUniqueEmailMerchantValidator(),
+                $this->createUniqueMerchantReferenceMerchantValidator(),
+                $this->createUniqueNameMerchantValidator(),
+                $this->createUrlMerchantValidator(),
+            ],
+            $this->getMerchantValidatorPlugins(),
+        );
     }
 
     public function createUniqueEmailMerchantValidator(): MerchantValidatorInterface

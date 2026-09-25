@@ -29,7 +29,9 @@ interface MerchantFacadeInterface
      *   - contactPersonPhone
      *   - email
      *   - storeRelation
-     * - Validates the merchant with the {@link \Spryker\Zed\MerchantExtension\Dependency\Plugin\MerchantValidatorPluginInterface} stack, which rejects an email, a merchant reference or a merchant URL another merchant already uses.
+     * - Validates that `MerchantTransfer.email`, `MerchantTransfer.merchantReference` and `MerchantTransfer.name` are not used by another merchant.
+     * - Validates that every `MerchantTransfer.urlCollection` entry is present, short enough for `spy_url.url` and not owned by another resource.
+     * - Executes a stack of {@link \Spryker\Zed\MerchantExtension\Dependency\Plugin\MerchantValidatorPluginInterface} for project-specific validation.
      * - Returns MerchantResponseTransfer.isSuccess=false and error messages if validation fails, without persisting anything.
      * - Persists the entity to DB.
      * - Sets ID to the returning transfer.
@@ -62,7 +64,9 @@ interface MerchantFacadeInterface
      * - Calls a stack of `MerchantPostUpdatePluginInterface` after merchant is updated.
      * - Returns MerchantResponseTransfer.isSuccess=false and error messages if merchant not found.
      * - Returns MerchantResponseTransfer.isSuccess=false and error messages if merchant status transition is not valid.
-     * - Validates the merchant with the {@link \Spryker\Zed\MerchantExtension\Dependency\Plugin\MerchantValidatorPluginInterface} stack, which rejects an email, a merchant reference or a merchant URL another merchant already uses.
+     * - Validates that `MerchantTransfer.email`, `MerchantTransfer.merchantReference` and `MerchantTransfer.name` are not used by another merchant.
+     * - Validates that every `MerchantTransfer.urlCollection` entry is present, short enough for `spy_url.url` and not owned by another resource.
+     * - Executes a stack of {@link \Spryker\Zed\MerchantExtension\Dependency\Plugin\MerchantValidatorPluginInterface} for project-specific validation.
      * - Returns MerchantResponseTransfer.isSuccess=false and error messages if validation fails, without persisting anything.
      * - Persists the entity to DB.
      * - Returns MerchantResponseTransfer.isSuccess=true and updated MerchantTransfer.
