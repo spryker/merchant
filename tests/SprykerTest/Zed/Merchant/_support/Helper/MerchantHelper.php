@@ -89,9 +89,7 @@ class MerchantHelper extends Module
     }
 
     /**
-     * @param array $seedData
-     *
-     * @return \Generated\Shared\Transfer\StoreTransfer
+     * @param array<string, mixed> $seedData
      */
     public function getStoreRelationTransfer(array $seedData = []): StoreRelationTransfer
     {

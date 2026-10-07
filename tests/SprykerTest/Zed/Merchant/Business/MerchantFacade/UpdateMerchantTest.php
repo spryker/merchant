@@ -8,7 +8,6 @@
 namespace SprykerTest\Zed\Merchant\Business\MerchantFacade;
 
 use Codeception\Test\Unit;
-use Generated\Shared\DataBuilder\StoreRelationBuilder;
 use Generated\Shared\Transfer\MerchantResponseTransfer;
 use Generated\Shared\Transfer\MerchantTransfer;
 use Generated\Shared\Transfer\StoreRelationTransfer;
@@ -131,15 +130,12 @@ class UpdateMerchantTest extends Unit
         $this->assertFalse($merchantResponseTransfer->getIsSuccess());
     }
 
-    public function testUpdateMerchantStores(): void
+    public function testGivenAnAdditionalStoreWhenUpdatingMerchantThenBothStoresAreAssigned(): void
     {
         // Arrange
         $storeTransfer1 = $this->tester->haveStore([StoreTransfer::NAME => 'DE']);
         $storeTransfer2 = $this->tester->haveStore([StoreTransfer::NAME => 'AT']);
-        $storeRelationTransfer = (new StoreRelationBuilder())->seed([
-            StoreRelationTransfer::ID_STORES => [$storeTransfer1->getIdStore()],
-        ])->build();
-        $merchantTransfer = $this->tester->haveMerchant([MerchantTransfer::STORE_RELATION => $storeRelationTransfer->toArray()]);
+        $merchantTransfer = $this->tester->haveMerchantWithStore([StoreRelationTransfer::ID_STORES => [$storeTransfer1->getIdStore()]]);
         $storesIds = [
             $storeTransfer1->getIdStore(),
             $storeTransfer2->getIdStore(),
@@ -151,10 +147,85 @@ class UpdateMerchantTest extends Unit
         $merchantTransfer = $merchantResponseTransfer->getMerchant();
 
         // Assert
-        $this->assertCount(count($storesIds), $merchantTransfer->getStoreRelation()->getStores());
-        foreach ($merchantTransfer->getStoreRelation()->getIdStores() as $idStore) {
-            $this->assertTrue(in_array($idStore, $storesIds));
-        }
+        $this->assertEqualsCanonicalizing($storesIds, $merchantTransfer->getStoreRelation()->getIdStores());
+        $this->assertEqualsCanonicalizing($storesIds, $this->getStoreIds($merchantTransfer->getStoreRelation()));
+    }
+
+    public function testGivenUnchangedStoresWhenUpdatingMerchantThenTheCurrentStoreRelationIsReturned(): void
+    {
+        // Arrange
+        $storeTransfer = $this->tester->haveStore([StoreTransfer::NAME => 'DE']);
+        $merchantTransfer = $this->tester->haveMerchantWithStore([StoreRelationTransfer::ID_STORES => [$storeTransfer->getIdStoreOrFail()]]);
+        $merchantTransfer->setStoreRelation(
+            (new StoreRelationTransfer())->setIdStores([$storeTransfer->getIdStoreOrFail()]),
+        );
+
+        // Act
+        $merchantResponseTransfer = $this->tester->getFacade()->updateMerchant($merchantTransfer);
+
+        // Assert
+        $storeRelationTransfer = $merchantResponseTransfer->getMerchantOrFail()->getStoreRelationOrFail();
+        $this->assertTrue($merchantResponseTransfer->getIsSuccess());
+        $this->assertSame([$storeTransfer->getIdStoreOrFail()], $storeRelationTransfer->getIdStores());
+        $this->assertSame([$storeTransfer->getIdStoreOrFail()], $this->getStoreIds($storeRelationTransfer));
+    }
+
+    public function testGivenADuplicatedStoreIdWhenUpdatingMerchantThenTheStoreIsAssignedOnce(): void
+    {
+        // Arrange
+        $storeTransfer1 = $this->tester->haveStore([StoreTransfer::NAME => 'DE']);
+        $storeTransfer2 = $this->tester->haveStore([StoreTransfer::NAME => 'AT']);
+        $merchantTransfer = $this->tester->haveMerchantWithStore([StoreRelationTransfer::ID_STORES => [$storeTransfer1->getIdStoreOrFail()]]);
+        $merchantTransfer->setStoreRelation((new StoreRelationTransfer())->setIdStores([
+            $storeTransfer1->getIdStoreOrFail(),
+            $storeTransfer2->getIdStoreOrFail(),
+            $storeTransfer2->getIdStoreOrFail(),
+        ]));
+
+        // Act
+        $merchantResponseTransfer = $this->tester->getFacade()->updateMerchant($merchantTransfer);
+
+        // Assert
+        $storeRelationTransfer = $merchantResponseTransfer->getMerchantOrFail()->getStoreRelationOrFail();
+        $expectedStoreIds = [$storeTransfer1->getIdStoreOrFail(), $storeTransfer2->getIdStoreOrFail()];
+        $this->assertTrue($merchantResponseTransfer->getIsSuccess());
+        $this->assertEqualsCanonicalizing($expectedStoreIds, $storeRelationTransfer->getIdStores());
+        $this->assertEqualsCanonicalizing($expectedStoreIds, $this->getStoreIds($storeRelationTransfer));
+    }
+
+    public function testGivenARemovedStoreWhenUpdatingMerchantThenTheRemainingStoreRelationIsReturned(): void
+    {
+        // Arrange
+        $storeTransfer1 = $this->tester->haveStore([StoreTransfer::NAME => 'DE']);
+        $storeTransfer2 = $this->tester->haveStore([StoreTransfer::NAME => 'AT']);
+        $merchantTransfer = $this->tester->haveMerchantWithStore([
+            StoreRelationTransfer::ID_STORES => [
+                $storeTransfer1->getIdStoreOrFail(),
+                $storeTransfer2->getIdStoreOrFail(),
+            ],
+        ]);
+        $merchantTransfer->setStoreRelation(
+            (new StoreRelationTransfer())->setIdStores([$storeTransfer1->getIdStoreOrFail()]),
+        );
+
+        // Act
+        $merchantResponseTransfer = $this->tester->getFacade()->updateMerchant($merchantTransfer);
+
+        // Assert
+        $storeRelationTransfer = $merchantResponseTransfer->getMerchantOrFail()->getStoreRelationOrFail();
+        $this->assertSame([$storeTransfer1->getIdStoreOrFail()], $storeRelationTransfer->getIdStores());
+        $this->assertSame([$storeTransfer1->getIdStoreOrFail()], $this->getStoreIds($storeRelationTransfer));
+    }
+
+    /**
+     * @return array<int>
+     */
+    protected function getStoreIds(StoreRelationTransfer $storeRelationTransfer): array
+    {
+        return array_map(
+            fn (StoreTransfer $storeTransfer): int => $storeTransfer->getIdStoreOrFail(),
+            $storeRelationTransfer->getStores()->getArrayCopy(),
+        );
     }
 
     public function getCorrectStatusTransitions(): array

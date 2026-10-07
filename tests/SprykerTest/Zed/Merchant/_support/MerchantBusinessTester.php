@@ -15,8 +15,6 @@ use Generated\Shared\Transfer\MerchantCriteriaTransfer;
 use Generated\Shared\Transfer\MerchantTransfer;
 use Generated\Shared\Transfer\PriceProductMerchantRelationshipStorageTransfer;
 use Generated\Shared\Transfer\PriceProductMerchantRelationshipValueTransfer;
-use Generated\Shared\Transfer\StoreRelationTransfer;
-use Generated\Shared\Transfer\StoreTransfer;
 use Orm\Zed\Merchant\Persistence\SpyMerchantQuery;
 use PHPUnit\Framework\Constraint\Callback;
 use PHPUnit\Framework\MockObject\Rule\InvokedAtLeastOnce as InvokedAtLeastOnceMatcher;
@@ -94,13 +92,16 @@ class MerchantBusinessTester extends Actor
         return $this->getLocator()->store()->facade();
     }
 
-    public function haveMerchantWithStore(): MerchantTransfer
+    /**
+     * @param array<string, mixed> $seedData
+     */
+    public function haveMerchantWithStore(array $seedData = []): MerchantTransfer
     {
-        $storeRelationTransfer = $this->getStoreRelationTransfer();
+        $storeRelationTransfer = $this->getStoreRelationTransfer($seedData);
 
         $merchantTransfer = $this->haveMerchant([MerchantTransfer::STORE_RELATION => $storeRelationTransfer->toArray()]);
 
-        return $this->getFacade()->findOne((new MerchantCriteriaTransfer())->setIdMerchant($merchantTransfer->getIdMerchant()));
+        return $this->getFacade()->findOne((new MerchantCriteriaTransfer())->setIdMerchant($merchantTransfer->getIdMerchantOrFail()));
     }
 
     public function getMerchantTransferWithStore(): MerchantTransfer
@@ -191,16 +192,6 @@ class MerchantBusinessTester extends Actor
 
                 return true;
             }));
-    }
-
-    public function getStoreRelationTransfer(): StoreRelationTransfer
-    {
-        $storeTransfer = $this->haveStore([StoreTransfer::NAME => 'DE']);
-        $storeRelationTransfer = (new StoreRelationBuilder())->seed([
-            StoreRelationTransfer::ID_STORES => [$storeTransfer->getIdStore()],
-        ])->build();
-
-        return $storeRelationTransfer;
     }
 
     public function getStoreReferences(): array

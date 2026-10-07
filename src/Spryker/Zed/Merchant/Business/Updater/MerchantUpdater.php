@@ -7,11 +7,13 @@
 
 namespace Spryker\Zed\Merchant\Business\Updater;
 
+use ArrayObject;
 use Generated\Shared\Transfer\EventEntityTransfer;
 use Generated\Shared\Transfer\MerchantCriteriaTransfer;
 use Generated\Shared\Transfer\MerchantErrorTransfer;
 use Generated\Shared\Transfer\MerchantResponseTransfer;
 use Generated\Shared\Transfer\MerchantTransfer;
+use Generated\Shared\Transfer\StoreRelationTransfer;
 use Spryker\Zed\EventBehavior\EventBehaviorConfig;
 use Spryker\Zed\Kernel\Persistence\EntityManager\TransactionTrait;
 use Spryker\Zed\Merchant\Business\Exception\MerchantNotSavedException;
@@ -178,21 +180,40 @@ class MerchantUpdater implements MerchantUpdaterInterface
 
         /** @var \Generated\Shared\Transfer\StoreRelationTransfer $storeRelationTransfer */
         $storeRelationTransfer = $merchantTransfer->getStoreRelation();
+        $requestedStoreIds = array_values(array_unique($storeRelationTransfer->getIdStores()));
 
         if (!$currentStoreRelationTransfer->getIdStores()) {
-            return $this->createMerchantStores(
-                $merchantTransfer,
-                $storeRelationTransfer->getIdStores(),
-            );
+            return $this->createMerchantStores($merchantTransfer, $requestedStoreIds);
         }
 
         $currentStoreIds = $currentStoreRelationTransfer->getIdStores();
-        $requestedStoreIds = $storeRelationTransfer->getIdStores();
+
+        $storeRelationTransfer->setStores($this->getRetainedStoreTransfers($currentStoreRelationTransfer, $requestedStoreIds));
 
         $merchantTransfer = $this->createMerchantStores($merchantTransfer, array_diff($requestedStoreIds, $currentStoreIds));
         $this->deleteMerchantStores($merchantTransfer, array_diff($currentStoreIds, $requestedStoreIds));
 
         return $merchantTransfer;
+    }
+
+    /**
+     * @param array<int> $requestedStoreIds
+     *
+     * @return \ArrayObject<int, \Generated\Shared\Transfer\StoreTransfer>
+     */
+    protected function getRetainedStoreTransfers(
+        StoreRelationTransfer $currentStoreRelationTransfer,
+        array $requestedStoreIds
+    ): ArrayObject {
+        $retainedStoreTransfers = new ArrayObject();
+
+        foreach ($currentStoreRelationTransfer->getStores() as $storeTransfer) {
+            if (in_array($storeTransfer->getIdStore(), $requestedStoreIds, true)) {
+                $retainedStoreTransfers->append($storeTransfer);
+            }
+        }
+
+        return $retainedStoreTransfers;
     }
 
     /**
@@ -213,7 +234,7 @@ class MerchantUpdater implements MerchantUpdaterInterface
 
         $storeRelationTransfer
             ->setIdEntity($merchantTransfer->getIdMerchant())
-            ->setIdStores($storeIds);
+            ->setIdStores(array_values(array_unique(array_merge($storeRelationTransfer->getIdStores(), $storeIds))));
 
         return $merchantTransfer;
     }

@@ -12,6 +12,8 @@
         <property name="merchantReference" type="string"/>
         <property name="urlCollection" type="Url[]" singular="url"/>
         <property name="storeRelation" type="StoreRelation"/>
+        <property name="merchantProfile" type="MerchantProfile"/>
+        <property name="stocks" type="Stock[]" singular="stock"/>
     </transfer>
 
     <transfer name="MerchantCriteria">
@@ -209,6 +211,10 @@
     </transfer>
 
     <transfer name="MerchantProfile">
+    </transfer>
+
+    <transfer name="Stock">
+        <property name="name" type="string"/>
     </transfer>
 
     <transfer name="LocaleCriteria">
