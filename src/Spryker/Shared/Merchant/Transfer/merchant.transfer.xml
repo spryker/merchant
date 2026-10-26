@@ -87,6 +87,8 @@
         <property name="fkResourceMerchant" type="int"/>
         <property name="urlPrefix" type="string"/>
         <property name="localeName" type="string"/>
+        <property name="url" type="string"/>
+        <property name="fkLocale" type="int"/>
     </transfer>
 
     <transfer name="CartChange">
@@ -123,6 +125,8 @@
     </transfer>
 
     <transfer name="Locale">
+        <property name="localeName" type="string"/>
+        <property name="idLocale" type="int"/>
     </transfer>
 
     <transfer name="Item">
@@ -218,14 +222,23 @@
     </transfer>
 
     <transfer name="LocaleCriteria">
+        <property name="localeConditions" type="LocaleConditions"/>
     </transfer>
 
     <transfer name="LocaleConditions">
+        <property name="storeNames" type="string[]" singular="storeName"/>
+        <property name="localeNames" type="string[]" singular="localeName"/>
     </transfer>
 
     <transfer name="StoreCriteria">
+        <property name="storeConditions" type="StoreConditions"/>
     </transfer>
 
     <transfer name="StoreConditions">
+        <property name="storeIds" type="array" singular="storeId"/>
+    </transfer>
+
+    <transfer name="StoreCollection">
+        <property name="stores" type="Store[]" singular="store" description="A collection of store data transfer objects."/>
     </transfer>
 </transfers>
