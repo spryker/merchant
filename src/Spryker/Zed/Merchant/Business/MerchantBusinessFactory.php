@@ -25,6 +25,8 @@ use Spryker\Zed\Merchant\Business\Publisher\MerchantMessageBrokerPublisher;
 use Spryker\Zed\Merchant\Business\Publisher\MerchantPublisherInterface;
 use Spryker\Zed\Merchant\Business\Reader\MerchantReader;
 use Spryker\Zed\Merchant\Business\Reader\MerchantReaderInterface;
+use Spryker\Zed\Merchant\Business\Resolver\MerchantModifiedColumnsResolver;
+use Spryker\Zed\Merchant\Business\Resolver\MerchantModifiedColumnsResolverInterface;
 use Spryker\Zed\Merchant\Business\Status\MerchantStatusReader;
 use Spryker\Zed\Merchant\Business\Status\MerchantStatusReaderInterface;
 use Spryker\Zed\Merchant\Business\Status\MerchantStatusValidator;
@@ -79,7 +81,13 @@ class MerchantBusinessFactory extends AbstractBusinessFactory
             $this->getEventFacade(),
             $this->createMerchantEventTrigger(),
             $this->createMerchantValidator(),
+            $this->createMerchantModifiedColumnsResolver(),
         );
+    }
+
+    public function createMerchantModifiedColumnsResolver(): MerchantModifiedColumnsResolverInterface
+    {
+        return new MerchantModifiedColumnsResolver();
     }
 
     public function createMerchantReader(): MerchantReaderInterface

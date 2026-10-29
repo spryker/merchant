@@ -18,6 +18,7 @@ use Spryker\Zed\EventBehavior\EventBehaviorConfig;
 use Spryker\Zed\Kernel\Persistence\EntityManager\TransactionTrait;
 use Spryker\Zed\Merchant\Business\Exception\MerchantNotSavedException;
 use Spryker\Zed\Merchant\Business\MerchantUrlSaver\MerchantUrlSaverInterface;
+use Spryker\Zed\Merchant\Business\Resolver\MerchantModifiedColumnsResolverInterface;
 use Spryker\Zed\Merchant\Business\Status\MerchantStatusValidatorInterface;
 use Spryker\Zed\Merchant\Business\Trigger\MerchantEventTriggerInterface;
 use Spryker\Zed\Merchant\Business\Validator\MerchantValidatorInterface;
@@ -87,7 +88,8 @@ class MerchantUpdater implements MerchantUpdaterInterface
         MerchantUrlSaverInterface $merchantUrlSaver,
         MerchantToEventFacadeInterface $eventFacade,
         MerchantEventTriggerInterface $merchantEventTrigger,
-        protected MerchantValidatorInterface $merchantValidator
+        protected MerchantValidatorInterface $merchantValidator,
+        protected MerchantModifiedColumnsResolverInterface $merchantModifiedColumnsResolver
     ) {
         $this->merchantEntityManager = $merchantEntityManager;
         $this->merchantRepository = $merchantRepository;
@@ -136,6 +138,14 @@ class MerchantUpdater implements MerchantUpdaterInterface
             return $validationMerchantResponseTransfer;
         }
 
+        $idMerchant = $merchantTransfer->getIdMerchantOrFail();
+        $existingMerchantTransfer->setStoreRelation(
+            $this->merchantRepository->getMerchantStoreRelationMapByMerchantIds([$idMerchant])[$idMerchant],
+        );
+
+        // Resolved before the save: afterwards the stored merchant already has the new values.
+        $modifiedColumns = $this->merchantModifiedColumnsResolver->resolveModifiedColumns($existingMerchantTransfer, $merchantTransfer);
+
         try {
             $merchantTransfer = $this->getTransactionHandler()->handleTransaction(function () use ($merchantTransfer) {
                 return $this->executeUpdateTransaction($merchantTransfer);
@@ -146,6 +156,8 @@ class MerchantUpdater implements MerchantUpdaterInterface
                 ->setErrors($merchantNotSavedException->getErrors())
                 ->setMerchant($merchantTransfer);
         }
+
+        $this->triggerPublishEvent($merchantTransfer, $modifiedColumns);
 
         $merchantResponseTransfer = $merchantResponseTransfer
             ->setIsSuccess(true)
@@ -164,8 +176,6 @@ class MerchantUpdater implements MerchantUpdaterInterface
         $merchantTransfer = $this->executeMerchantPostUpdatePlugins($merchantTransfer);
 
         $this->merchantEventTrigger->triggerMerchantUpdatedEvent($merchantTransfer);
-
-        $this->triggerPublishEvent($merchantTransfer);
 
         return $merchantTransfer;
     }
@@ -296,10 +306,14 @@ class MerchantUpdater implements MerchantUpdaterInterface
         return $merchantResponseTransfer;
     }
 
-    protected function triggerPublishEvent(MerchantTransfer $merchantTransfer): void
+    /**
+     * @param array<string> $modifiedColumns
+     */
+    protected function triggerPublishEvent(MerchantTransfer $merchantTransfer, array $modifiedColumns = []): void
     {
         $eventEntityTransfer = new EventEntityTransfer();
         $eventEntityTransfer->setId($merchantTransfer->getIdMerchant());
+        $eventEntityTransfer->setModifiedColumns($modifiedColumns);
 
         $this->eventFacade->trigger(MerchantEvents::MERCHANT_PUBLISH, $eventEntityTransfer);
     }

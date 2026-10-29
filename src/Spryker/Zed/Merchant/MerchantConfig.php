@@ -40,6 +40,16 @@ class MerchantConfig extends AbstractBundleConfig
     public const string STATUS_DENIED = 'denied';
 
     /**
+     * Specification:
+     * - Marks a `Merchant.merchant.publish` event of a merchant update where no `spy_merchant` column and no store relation changed.
+     * - The update changed only merchant related data, e.g. the merchant profile or the merchant URLs.
+     * - The value is not a real column, so a listener that filters by real columns skips the event.
+     *
+     * @api
+     */
+    public const string MODIFIED_COLUMN_MERCHANT_RELATED_DATA = 'spy_merchant.related_data';
+
+    /**
      * @api
      *
      * @var array<string>
