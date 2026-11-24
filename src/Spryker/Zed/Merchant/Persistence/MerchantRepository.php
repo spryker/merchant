@@ -148,6 +148,7 @@ class MerchantRepository extends AbstractRepository implements MerchantRepositor
             ->getUrlPropelQuery()
             ->joinWithSpyLocale()
             ->filterByFkResourceMerchant_In($merchantIds)
+            ->orderByIdUrl()
             ->find();
 
         if (!$urlEntities->count()) {
